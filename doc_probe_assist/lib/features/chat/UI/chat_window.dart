@@ -63,12 +63,16 @@ class ChatWidget extends StatelessWidget {
               image: AssetImage("assets/doc_probe_logo.png"),
             ),
           ),
-          margin: const EdgeInsets.all(10),
+          margin: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
           child: Column(
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  SizedBox(
+                    height: 65,
+                    child: Image.asset("assets/acoe_logo.png"),
+                  ),
                   SizedBox(
                     width: 300,
                     child: DropdownSearch<Document>(

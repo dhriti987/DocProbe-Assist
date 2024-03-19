@@ -19,12 +19,6 @@ ThemeData lightTheme = ThemeData(
       fontWeight: FontWeight.w900,
       fontSize: 16,
     ),
-    // labelTextStyle: MaterialStatePropertyAll(
-    //   TextStyle(
-    //     fontWeight: FontWeight.w900,
-    //     fontSize: 16,
-    //   ),
-    // ),
   ),
   textTheme: const TextTheme(
     displayMedium: TextStyle(
