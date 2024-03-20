@@ -1,14 +1,28 @@
 import 'package:doc_probe_assist/features/admin/UI/documents_screen.dart';
+import 'package:doc_probe_assist/features/admin/UI/feedback_screen.dart';
+import 'package:doc_probe_assist/features/admin/UI/users_screen.dart';
 import 'package:flutter/material.dart';
 
-class AdminPage extends StatelessWidget {
-  final String name = "Muskan Acharya";
-  final List<Widget> screens = const [DocumentScreen()];
+class AdminPage extends StatefulWidget {
   const AdminPage({super.key});
 
   @override
+  State<AdminPage> createState() => _AdminPageState();
+}
+
+class _AdminPageState extends State<AdminPage> {
+  final String name = "Muskan Acharya";
+
+  final List<Widget> screens = const [
+    SizedBox(),
+    UserScreen(),
+    DocumentScreen(),
+    FeedBackScreen()
+  ];
+  int index = 0;
+
+  @override
   Widget build(BuildContext context) {
-    int index = 0;
     return Scaffold(
       drawer: Drawer(
         child: ListView(
@@ -36,15 +50,30 @@ class AdminPage extends StatelessWidget {
               ],
             )),
             ListTile(
-              onTap: () {},
+              onTap: () {
+                setState(() {
+                  index = 1;
+                });
+                Navigator.pop(context);
+              },
               title: const Text("Users"),
             ),
             ListTile(
-              onTap: () {},
+              onTap: () {
+                setState(() {
+                  index = 2;
+                });
+                Navigator.pop(context);
+              },
               title: const Text("Documents"),
             ),
             ListTile(
-              onTap: () {},
+              onTap: () {
+                setState(() {
+                  index = 3;
+                });
+                Navigator.pop(context);
+              },
               title: const Text("Feedbacks"),
             ),
           ],

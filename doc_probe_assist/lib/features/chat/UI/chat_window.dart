@@ -67,11 +67,10 @@ class ChatWidget extends StatelessWidget {
           child: Column(
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  SizedBox(
+                  const SizedBox(
                     height: 65,
-                    child: Image.asset("assets/acoe_logo.png"),
                   ),
                   SizedBox(
                     width: 300,

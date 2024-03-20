@@ -24,7 +24,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   FutureOr<void> onFetchDataEvent(
       FetchDataEvent event, Emitter<ChatState> emit) async {
     emit(ChatPageLoadingState());
-    await Future.delayed(const Duration(seconds: 5), () {
+    await Future.delayed(const Duration(seconds: 1), () {
       emit(ChatPageLoadingSuccessState(chats: [
         ChatModel(id: 1, chatName: "Chat 1", chatMessages: [
           ChatMessage(

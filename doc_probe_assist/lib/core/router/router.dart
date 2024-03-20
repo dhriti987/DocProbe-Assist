@@ -50,10 +50,10 @@ class AppRouter {
         //   },
         // ),
       ],
-      redirect: (context, state) {
-        // if (isAuthenticated == false) return "/login";
-        return "/chat";
-      },
+      // redirect: (context, state) {
+      //   // if (isAuthenticated == false) return "/login";
+      //   return "/";
+      // },
     );
     return router;
   }

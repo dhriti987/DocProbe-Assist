@@ -2,6 +2,7 @@ import 'package:doc_probe_assist/features/chat/bloc/chat_bloc.dart';
 import 'package:doc_probe_assist/models/chat_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 class LeftChatTab extends StatelessWidget {
   LeftChatTab({
@@ -40,6 +41,7 @@ class LeftChatTab extends StatelessWidget {
           ),
           child: Column(
             children: [
+              const UserWidget(),
               InkWell(
                 onTap: () {
                   showDialog(
@@ -100,10 +102,10 @@ class LeftChatTab extends StatelessWidget {
                 itemCount: chats.length,
               ),
               const Spacer(),
-              const UserWidget(),
-              const SizedBox(
-                height: 20,
-              )
+              SizedBox(
+                height: 65,
+                child: Image.asset("assets/acoe_logo.png"),
+              ),
             ],
           ),
         );
@@ -165,6 +167,13 @@ class UserWidget extends StatelessWidget {
           PopupMenuItem(
             child: Text(
               "Settings",
+              style: Theme.of(context).textTheme.labelMedium,
+            ),
+          ),
+          PopupMenuItem(
+            onTap: () => context.push('/admin'),
+            child: Text(
+              "Admin Panel",
               style: Theme.of(context).textTheme.labelMedium,
             ),
           ),
