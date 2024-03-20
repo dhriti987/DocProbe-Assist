@@ -1,6 +1,7 @@
 import 'package:doc_probe_assist/features/home/bloc/home_bloc.dart';
 import 'package:doc_probe_assist/service_locator.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:text_3d/text_3d.dart';
 
 class HomePage extends StatelessWidget {
@@ -68,6 +69,7 @@ class HomePage extends StatelessWidget {
                                 onPressed: () {
                                   homeBloc
                                       .add(LoginToContinueButtonClickedEvent());
+                                  context.push('/login');
                                 },
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),

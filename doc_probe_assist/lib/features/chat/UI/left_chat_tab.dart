@@ -159,17 +159,18 @@ class UserWidget extends StatelessWidget {
       itemBuilder: (context) {
         return [
           PopupMenuItem(
+            onTap: () => context.push('/about-us'),
             child: Text(
               "About us",
               style: Theme.of(context).textTheme.labelMedium,
             ),
           ),
-          PopupMenuItem(
-            child: Text(
-              "Settings",
-              style: Theme.of(context).textTheme.labelMedium,
-            ),
-          ),
+          // PopupMenuItem(
+          //   child: Text(
+          //     "Settings",
+          //     style: Theme.of(context).textTheme.labelMedium,
+          //   ),
+          // ),
           PopupMenuItem(
             onTap: () => context.push('/admin'),
             child: Text(

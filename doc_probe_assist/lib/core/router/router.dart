@@ -1,8 +1,10 @@
 // import 'package:flutter/material.dart';
 
+import 'package:doc_probe_assist/features/about_us/UI/about_us_page.dart';
 import 'package:doc_probe_assist/features/admin/UI/admin_page.dart';
 import 'package:doc_probe_assist/features/chat/UI/chat_page.dart';
 import 'package:doc_probe_assist/features/home/UI/home_page.dart';
+import 'package:doc_probe_assist/features/login/UI/login_page.dart';
 import 'package:doc_probe_assist/features/settings/UI/settings_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -25,6 +27,16 @@ class AppRouter {
           path: '/',
           name: 'Home',
           builder: (context, state) => HomePage(),
+        ),
+        GoRoute(
+          path: '/login',
+          name: 'Login',
+          builder: (context, state) => const LoginPage(),
+        ),
+        GoRoute(
+          path: '/about-us',
+          name: 'AboutUs',
+          builder: (context, state) => const AboutUsPage(),
         ),
         GoRoute(
           path: '/chat',

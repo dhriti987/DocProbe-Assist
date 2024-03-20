@@ -49,6 +49,7 @@ dependencies:
   typewritertext: ^3.0.2
   dropdown_search: ^5.0.6
   url_launcher: ^6.2.5
+  animated_text_kit: ^4.2.2
 
 dev_dependencies:
   flutter_test:
