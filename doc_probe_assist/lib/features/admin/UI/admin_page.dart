@@ -1,3 +1,4 @@
+import 'package:doc_probe_assist/features/admin/UI/analytics_screen.dart';
 import 'package:doc_probe_assist/features/admin/UI/documents_screen.dart';
 import 'package:doc_probe_assist/features/admin/UI/feedback_screen.dart';
 import 'package:doc_probe_assist/features/admin/UI/users_screen.dart';
@@ -14,7 +15,7 @@ class _AdminPageState extends State<AdminPage> {
   final String name = "Muskan Acharya";
 
   final List<Widget> screens = const [
-    SizedBox(),
+    AnalyticsScreen(),
     UserScreen(),
     DocumentScreen(),
     FeedBackScreen()

@@ -8,7 +8,7 @@ class UserScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     List<UserModel> users = [
       UserModel(
-          name: "Hetvi Kumari",
+          name: "Hetvi Patel",
           username: "54321",
           isAdmin: true,
           email: "intern.hetvi@adani.com"),
