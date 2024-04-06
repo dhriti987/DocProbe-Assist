@@ -14,7 +14,9 @@ class AppRouter {
   bool isAuthenticated = false;
   bool isAdmin = false;
 
-  AppRouter({required this.pref});
+  AppRouter({required this.pref}) {
+    isAuthenticated = pref.getString('token') == null ? false : true;
+  }
 
   // bool checkIsAuthenticated() {
   //   return pref.getString('token') != null;
@@ -31,7 +33,7 @@ class AppRouter {
         GoRoute(
           path: '/login',
           name: 'Login',
-          builder: (context, state) => const LoginPage(),
+          builder: (context, state) => LoginPage(),
         ),
         GoRoute(
           path: '/about-us',
@@ -62,10 +64,11 @@ class AppRouter {
         //   },
         // ),
       ],
-      // redirect: (context, state) {
-      //   // if (isAuthenticated == false) return "/login";
-      //   return "/";
-      // },
+      redirect: (context, state) {
+        print(isAuthenticated);
+        if (isAuthenticated == false) return "/login";
+        return null;
+      },
     );
     return router;
   }

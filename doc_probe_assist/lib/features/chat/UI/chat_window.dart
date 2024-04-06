@@ -1,10 +1,13 @@
 import 'package:doc_probe_assist/features/chat/bloc/chat_bloc.dart';
+import 'package:doc_probe_assist/features/chat/repository/chat_repository.dart';
 import 'package:doc_probe_assist/models/chat_message_model.dart';
 import 'package:doc_probe_assist/models/chat_model.dart';
 import 'package:doc_probe_assist/models/document_model.dart';
+import 'package:doc_probe_assist/service_locator.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:typewritertext/typewritertext.dart';
 
 class ChatWidget extends StatelessWidget {
@@ -26,7 +29,11 @@ class ChatWidget extends StatelessWidget {
     ScrollController scrollController = ScrollController();
     return BlocConsumer<ChatBloc, ChatState>(
       bloc: chatBloc,
-      listener: (context, state) {},
+      listener: (context, state) {
+        if (state is LogoutState) {
+          context.go('/');
+        }
+      },
       builder: (context, state) {
         if (state is ChatPageLoadingSuccessState) {
           chats = List.from(state.chats);
@@ -124,6 +131,7 @@ class ChatWidget extends StatelessWidget {
                         ),
                         suffixIcon: IconButton(
                           onPressed: () {
+                            sl.get<ChatRepository>().getDocuments();
                             if (index != null) {
                               chatBloc.add(ResolveQueryEvent(
                                   chatIndex: chats[index!].id,

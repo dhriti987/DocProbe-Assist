@@ -12,8 +12,10 @@ class ChatPageLoadingState extends ChatState {}
 class ChatPageLoadingSuccessState extends ChatState {
   final List<ChatModel> chats;
   final List<Document> documents;
+  final UserModel user;
 
-  ChatPageLoadingSuccessState({required this.chats, required this.documents});
+  ChatPageLoadingSuccessState(
+      {required this.chats, required this.documents, required this.user});
 }
 
 class ChatPageLoadingFailedState extends ChatState {}
@@ -43,3 +45,5 @@ class NewChatMessageState extends ChatState {
 
   NewChatMessageState({required this.chatMessage});
 }
+
+class LogoutState extends ChatActionState {}

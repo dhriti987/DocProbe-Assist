@@ -5,6 +5,7 @@ class FeedBackModel {
   final bool isGood;
   final String feedback;
   final String date;
+  final int rating;
 
   FeedBackModel(
       {required this.question,
@@ -12,5 +13,6 @@ class FeedBackModel {
       required this.username,
       required this.isGood,
       required this.feedback,
-      required this.date});
+      required this.date,
+      required this.rating});
 }

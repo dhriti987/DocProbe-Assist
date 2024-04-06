@@ -8,11 +8,11 @@ class ApiService {
   ApiService({required this.pref});
 
   BaseOptions getApiOptions() {
-    final token = pref.getString("accessToken") ?? "";
+    final token = pref.getString("token") ?? "";
     final apiOptions = BaseOptions(
         baseUrl: dotenv.env['SERVER_URL'] ?? "http://127.0.0.1:8000",
         connectTimeout: const Duration(seconds: 5),
-        headers: {"Authorization": "Bearer $token"});
+        headers: {"Authorization": "Token $token"});
     return apiOptions;
   }
 

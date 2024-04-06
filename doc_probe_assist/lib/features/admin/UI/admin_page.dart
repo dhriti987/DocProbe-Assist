@@ -1,6 +1,8 @@
 import 'package:doc_probe_assist/features/admin/UI/documents_screen.dart';
 import 'package:doc_probe_assist/features/admin/UI/feedback_screen.dart';
 import 'package:doc_probe_assist/features/admin/UI/users_screen.dart';
+import 'package:doc_probe_assist/features/admin/bloc/admin_bloc.dart';
+import 'package:doc_probe_assist/service_locator.dart';
 import 'package:flutter/material.dart';
 
 class AdminPage extends StatefulWidget {
@@ -12,6 +14,7 @@ class AdminPage extends StatefulWidget {
 
 class _AdminPageState extends State<AdminPage> {
   final String name = "Muskan Acharya";
+  final adminBloc = sl.get<AdminBloc>();
 
   final List<Widget> screens = const [
     SizedBox(),
@@ -20,6 +23,10 @@ class _AdminPageState extends State<AdminPage> {
     FeedBackScreen()
   ];
   int index = 0;
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

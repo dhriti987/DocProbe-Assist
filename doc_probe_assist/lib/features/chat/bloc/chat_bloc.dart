@@ -1,16 +1,21 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:doc_probe_assist/features/chat/repository/chat_repository.dart';
+import 'package:doc_probe_assist/features/login/repository/login_repository.dart';
 import 'package:doc_probe_assist/models/chat_message_model.dart';
 import 'package:doc_probe_assist/models/chat_model.dart';
 import 'package:doc_probe_assist/models/document_model.dart';
 import 'package:doc_probe_assist/models/reference_model.dart';
+import 'package:doc_probe_assist/models/user_model.dart';
+import 'package:doc_probe_assist/service_locator.dart';
 import 'package:meta/meta.dart';
 
 part 'chat_event.dart';
 part 'chat_state.dart';
 
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
+  final chatRepository = sl.get<ChatRepository>();
   ChatBloc() : super(ChatInitial()) {
     on<ChatEvent>((event, emit) {});
     on<FetchDataEvent>(onFetchDataEvent);
@@ -19,56 +24,52 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<RenameChatOptionClickedEvent>(onRenameChatOptionClickedEvent);
     on<DeleteChatOptionClickedEvent>(onDeleteChatOptionClickedEvent);
     on<ResolveQueryEvent>(onResolveQueryEvent);
+    on<LogoutButtonClickedEvent>(onLogoutButtonClickedEvent);
   }
 
   FutureOr<void> onFetchDataEvent(
       FetchDataEvent event, Emitter<ChatState> emit) async {
     emit(ChatPageLoadingState());
-    await Future.delayed(const Duration(seconds: 1), () {
-      emit(ChatPageLoadingSuccessState(chats: [
-        ChatModel(id: 1, chatName: "Chat 1", chatMessages: [
-          ChatMessage(
-              id: 1,
-              query: "Hello how are you?",
-              response: "I am Good",
-              chatId: 1,
-              time: "12/11/23"),
-          ChatMessage(
-              id: 1,
-              query: "How can you assist me?",
-              response: "I can you assist you with several type of queries.",
-              chatId: 1,
-              time: "12/11/23"),
-        ], reference: [
-          Reference(
-              docName: "Document 1",
-              pageNumber: 42,
-              url: "https://www.clickdimensions.com/links/TestPDFfile.pdf")
-        ]),
-        ChatModel(id: 2, chatName: "Chat 2", chatMessages: [
-          ChatMessage(
-              id: 1,
-              query: "how can you help me?",
-              response: "ayw mate, I can help you with what you need to know.",
-              chatId: 2,
-              time: "12/11/23")
-        ], reference: [
-          Reference(
-              docName: "Document 2",
-              pageNumber: 42,
-              url: "https://www.clickdimensions.com/links/TestPDFfile.pdf")
-        ])
-      ], documents: [
-        Document(id: 1, docName: "Document 1"),
-        Document(id: 2, docName: "Document 2"),
-        Document(id: 3, docName: "Hetvi"),
-        Document(id: 4, docName: "Muskaan"),
-        Document(id: 6, docName: "Muskaan"),
-        Document(id: 7, docName: "Muskaan"),
-        Document(id: 8, docName: "Muskaan"),
-        Document(id: 9, docName: "Muskaan"),
-      ]));
-    });
+    List<Document> documents = await chatRepository.getDocuments();
+    UserModel user = await chatRepository.getUser();
+    emit(ChatPageLoadingSuccessState(
+        user: user,
+        chats: [
+          ChatModel(id: 1, chatName: "Chat 1", chatMessages: [
+            ChatMessage(
+                id: 1,
+                query: "Hello how are you?",
+                response: "I am Good",
+                chatId: 1,
+                time: "12/11/23"),
+            ChatMessage(
+                id: 1,
+                query: "How can you assist me?",
+                response: "I can you assist you with several type of queries.",
+                chatId: 1,
+                time: "12/11/23"),
+          ], reference: [
+            Reference(
+                docName: "Document 1",
+                pageNumber: 42,
+                url: "https://www.clickdimensions.com/links/TestPDFfile.pdf")
+          ]),
+          ChatModel(id: 2, chatName: "Chat 2", chatMessages: [
+            ChatMessage(
+                id: 1,
+                query: "how can you help me?",
+                response:
+                    "ayw mate, I can help you with what you need to know.",
+                chatId: 2,
+                time: "12/11/23")
+          ], reference: [
+            Reference(
+                docName: "Document 2",
+                pageNumber: 42,
+                url: "https://www.clickdimensions.com/links/TestPDFfile.pdf")
+          ])
+        ],
+        documents: documents));
   }
 
   FutureOr<void> onChatTileClickedEvent(
@@ -121,5 +122,11 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         ),
       );
     });
+  }
+
+  FutureOr<void> onLogoutButtonClickedEvent(
+      LogoutButtonClickedEvent event, Emitter<ChatState> emit) async {
+    await sl.get<LoginRepository>().logout();
+    emit(LogoutState());
   }
 }

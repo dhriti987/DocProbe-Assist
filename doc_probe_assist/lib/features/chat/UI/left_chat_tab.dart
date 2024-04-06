@@ -1,5 +1,6 @@
 import 'package:doc_probe_assist/features/chat/bloc/chat_bloc.dart';
 import 'package:doc_probe_assist/models/chat_model.dart';
+import 'package:doc_probe_assist/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -16,12 +17,14 @@ class LeftChatTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<ChatModel> chats = [];
+    UserModel? user;
     return BlocConsumer<ChatBloc, ChatState>(
       bloc: chatBloc,
       listener: (context, state) {},
       builder: (context, state) {
         if (state is ChatPageLoadingSuccessState) {
           chats = List.from(state.chats);
+          user = state.user;
         } else if (state is NewChatCreatedState) {
           chats.add(state.chat);
         } else if (state is ChatDeleteState) {
@@ -41,7 +44,11 @@ class LeftChatTab extends StatelessWidget {
           ),
           child: Column(
             children: [
-              const UserWidget(),
+              UserWidget(
+                name: user?.name ?? "Unknown User",
+                isAdmin: user?.isAdmin ?? false,
+                onLogout: () => chatBloc.add(LogoutButtonClickedEvent()),
+              ),
               InkWell(
                 onTap: () {
                   showDialog(
@@ -115,11 +122,15 @@ class LeftChatTab extends StatelessWidget {
 }
 
 class UserWidget extends StatelessWidget {
-  const UserWidget({
-    super.key,
-  });
+  const UserWidget(
+      {super.key,
+      required this.name,
+      required this.isAdmin,
+      required this.onLogout});
 
-  final name = "Muskaan Acharya";
+  final String name;
+  final bool isAdmin;
+  final void Function() onLogout;
 
   @override
   Widget build(BuildContext context) {
@@ -172,13 +183,20 @@ class UserWidget extends StatelessWidget {
           //   ),
           // ),
           PopupMenuItem(
+            enabled: isAdmin,
             onTap: () => context.push('/admin'),
             child: Text(
               "Admin Panel",
-              style: Theme.of(context).textTheme.labelMedium,
+              style: isAdmin
+                  ? Theme.of(context).textTheme.labelMedium
+                  : Theme.of(context)
+                      .textTheme
+                      .labelMedium
+                      ?.copyWith(color: Colors.grey),
             ),
           ),
           PopupMenuItem(
+            onTap: onLogout,
             child: Text(
               "Logout",
               style: Theme.of(context).textTheme.labelMedium,
