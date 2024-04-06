@@ -14,5 +14,5 @@ class FeedBackModel {
       required this.isGood,
       required this.feedback,
       required this.date,
-      required this.rating});
+      this.rating = 0});
 }
