@@ -131,7 +131,7 @@ class ChatWidget extends StatelessWidget {
                         ),
                         suffixIcon: IconButton(
                           onPressed: () {
-                            sl.get<ChatRepository>().getDocuments();
+                            sl.get<ChatRepository>().getAllDocuments();
                             if (index != null) {
                               chatBloc.add(ResolveQueryEvent(
                                   chatIndex: chats[index!].id,

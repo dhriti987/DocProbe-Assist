@@ -173,7 +173,9 @@ class LoginPage extends StatelessWidget {
                                 padding: EdgeInsets.only(bottom: 0.0),
                                 alignment: Alignment.bottomCenter,
                                 child: TextButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    context.go('/register');
+                                  },
                                   child: Text(
                                     "Don't have an account? Register",
                                     style: TextStyle(

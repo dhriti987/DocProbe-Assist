@@ -8,6 +8,8 @@ import 'package:doc_probe_assist/features/chat/repository/chat_repository.dart';
 import 'package:doc_probe_assist/features/home/bloc/home_bloc.dart';
 import 'package:doc_probe_assist/features/login/bloc/login_bloc.dart';
 import 'package:doc_probe_assist/features/login/repository/login_repository.dart';
+import 'package:doc_probe_assist/features/register/bloc/register_bloc.dart';
+import 'package:doc_probe_assist/features/register/repository/register_repository.dart';
 import 'package:doc_probe_assist/features/settings/bloc/setting_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -28,6 +30,7 @@ void setup() {
   sl.registerFactory(() => AdminBloc());
   sl.registerFactory(() => LoginBloc());
   sl.registerFactory(() => AboutBloc());
+  sl.registerFactory(() => RegisterBloc());
 
   sl.registerSingletonWithDependencies<LoginRepository>(
       () => LoginRepository(
@@ -38,5 +41,8 @@ void setup() {
       dependsOn: [ApiService]);
   sl.registerSingletonWithDependencies<AdminRepository>(
       () => AdminRepository(apiService: sl()),
+      dependsOn: [ApiService]);
+  sl.registerSingletonWithDependencies<RegisterRepository>(
+      () => RegisterRepository(apiService: sl()),
       dependsOn: [ApiService]);
 }
