@@ -37,7 +37,9 @@ class RevokeAdminAcessUserEvent extends AdminEvent {
 }
 
 // Document Panel
-class DocumentFetchEvent extends AdminEvent {}
+class AllDocumentFetchEvent extends AdminEvent {}
+
+class RequestedDocumentFetchEvent extends AdminEvent {}
 
 class ApproveDocumentEvent extends AdminEvent {
   final Document document;

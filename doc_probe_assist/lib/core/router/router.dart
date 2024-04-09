@@ -5,6 +5,7 @@ import 'package:doc_probe_assist/features/admin/UI/admin_page.dart';
 import 'package:doc_probe_assist/features/chat/UI/chat_page.dart';
 import 'package:doc_probe_assist/features/home/UI/home_page.dart';
 import 'package:doc_probe_assist/features/login/UI/login_page.dart';
+import 'package:doc_probe_assist/features/register/UI/register_page.dart';
 import 'package:doc_probe_assist/features/settings/UI/settings_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -36,6 +37,11 @@ class AppRouter {
           builder: (context, state) => LoginPage(),
         ),
         GoRoute(
+          path: '/register',
+          name: 'Register',
+          builder: (context, state) => RegisterPage(),
+        ),
+        GoRoute(
           path: '/about-us',
           name: 'AboutUs',
           builder: (context, state) => const AboutUsPage(),
@@ -65,8 +71,10 @@ class AppRouter {
         // ),
       ],
       redirect: (context, state) {
-        print(isAuthenticated);
-        if (isAuthenticated == false) return "/login";
+        if (isAuthenticated == false &&
+            ['/login', '/register', '/'].contains(state.fullPath))
+          return state.fullPath;
+        if (isAuthenticated == false) return '/login';
         return null;
       },
     );

@@ -11,27 +11,7 @@ class UserScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final adminBloc = sl.get<AdminBloc>();
-    List<UserModel> users = [
-      UserModel(
-          id: 1,
-          name: "Hetvi Kumari",
-          username: "54321",
-          isAdmin: true,
-          email: "intern.hetvi@adani.com"),
-      UserModel(
-          id: 2,
-          name: "Dhritiman Bharadwaj",
-          username: "54321",
-          isAdmin: false,
-          isActive: false,
-          email: "intern.dhritiman@adani.com"),
-      UserModel(
-          id: 3,
-          name: "Muskaan Acharya",
-          username: "54321",
-          isAdmin: true,
-          email: "intern.muskan@adani.com"),
-    ];
+    List<UserModel> users = [];
     return Padding(
       padding: EdgeInsets.all(20),
       child: BlocConsumer<AdminBloc, AdminState>(

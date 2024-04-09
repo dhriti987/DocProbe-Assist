@@ -34,14 +34,36 @@ class UpdateUserState extends AdminState {
 class UpdateUserFailedState extends AdminState {}
 
 // Document
+final class DocumentLoadingState extends AdminState {}
+
+final class DocumentLoadingSuccessState extends AdminState {
+  final Map<String, List<Document>> documents;
+
+  DocumentLoadingSuccessState({required this.documents});
+}
+
+final class DocumentLoadingFailedState extends AdminState {}
+
 class DocumentDeleteState extends AdminState {
   final Document document;
 
   DocumentDeleteState({required this.document});
 }
 
+class DocumentDeleteFailedState extends AdminState {}
+
 class DocumentApprovedState extends AdminState {
   final Document document;
 
   DocumentApprovedState({required this.document});
 }
+
+class DocumentApproveFailedState extends AdminState {}
+
+// Feedback
+
+class FeedbackLoadingState extends AdminState {}
+
+class FeedbackLoadingSuccessState extends AdminState {}
+
+class FeedbackLoadingFailedState extends AdminState {}

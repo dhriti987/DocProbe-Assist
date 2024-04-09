@@ -69,7 +69,7 @@ class HomePage extends StatelessWidget {
                                 onPressed: () {
                                   homeBloc
                                       .add(LoginToContinueButtonClickedEvent());
-                                  context.push('/login');
+                                  context.go('/login');
                                 },
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),

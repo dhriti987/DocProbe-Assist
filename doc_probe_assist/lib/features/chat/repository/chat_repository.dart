@@ -13,7 +13,7 @@ class ChatRepository {
 
   ChatRepository({required this.apiService});
 
-  Future<List<Document>> getDocuments() async {
+  Future<List<Document>> getAllDocuments() async {
     Dio api = apiService.getApi();
 
     try {

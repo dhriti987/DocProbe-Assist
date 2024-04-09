@@ -29,7 +29,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   FutureOr<void> onFetchDataEvent(
       FetchDataEvent event, Emitter<ChatState> emit) async {
     emit(ChatPageLoadingState());
-    List<Document> documents = await chatRepository.getDocuments();
+    List<Document> documents = await chatRepository.getAllDocuments();
     UserModel user = await chatRepository.getUser();
     List<ChatModel> chats = await chatRepository.getAllChats();
     emit(ChatPageLoadingSuccessState(
