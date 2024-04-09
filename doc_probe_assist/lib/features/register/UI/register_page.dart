@@ -1,5 +1,4 @@
 import 'package:doc_probe_assist/features/register/bloc/register_bloc.dart';
-import 'package:doc_probe_assist/features/register/repository/register_repository.dart';
 import 'package:doc_probe_assist/service_locator.dart';
 import 'package:flutter/material.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
@@ -23,7 +22,7 @@ class RegisterPage extends StatelessWidget {
 
     return BlocConsumer<RegisterBloc, RegisterState>(
       bloc: registerBloc,
-      buildWhen: (previous, current) => current is! RegisterState,
+      buildWhen: (previous, current) => current is! RegisterActionState,
       listenWhen: (previous, current) => current is RegisterActionState,
       listener: (context, state) {},
       builder: (context, state) {
