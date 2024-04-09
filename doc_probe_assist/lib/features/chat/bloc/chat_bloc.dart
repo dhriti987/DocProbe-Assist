@@ -6,7 +6,6 @@ import 'package:doc_probe_assist/features/login/repository/login_repository.dart
 import 'package:doc_probe_assist/models/chat_message_model.dart';
 import 'package:doc_probe_assist/models/chat_model.dart';
 import 'package:doc_probe_assist/models/document_model.dart';
-import 'package:doc_probe_assist/models/reference_model.dart';
 import 'package:doc_probe_assist/models/user_model.dart';
 import 'package:doc_probe_assist/service_locator.dart';
 import 'package:meta/meta.dart';
@@ -32,44 +31,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     emit(ChatPageLoadingState());
     List<Document> documents = await chatRepository.getDocuments();
     UserModel user = await chatRepository.getUser();
+    List<ChatModel> chats = await chatRepository.getAllChats();
     emit(ChatPageLoadingSuccessState(
-        user: user,
-        chats: [
-          ChatModel(id: 1, chatName: "Chat 1", chatMessages: [
-            ChatMessage(
-                id: 1,
-                query: "Hello how are you?",
-                response: "I am Good",
-                chatId: 1,
-                time: "12/11/23"),
-            ChatMessage(
-                id: 1,
-                query: "How can you assist me?",
-                response: "I can you assist you with several type of queries.",
-                chatId: 1,
-                time: "12/11/23"),
-          ], reference: [
-            Reference(
-                docName: "Document 1",
-                pageNumber: 42,
-                url: "https://www.clickdimensions.com/links/TestPDFfile.pdf")
-          ]),
-          ChatModel(id: 2, chatName: "Chat 2", chatMessages: [
-            ChatMessage(
-                id: 1,
-                query: "how can you help me?",
-                response:
-                    "ayw mate, I can help you with what you need to know.",
-                chatId: 2,
-                time: "12/11/23")
-          ], reference: [
-            Reference(
-                docName: "Document 2",
-                pageNumber: 42,
-                url: "https://www.clickdimensions.com/links/TestPDFfile.pdf")
-          ])
-        ],
-        documents: documents));
+        user: user, chats: chats, documents: documents));
   }
 
   FutureOr<void> onChatTileClickedEvent(
@@ -78,11 +42,12 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   }
 
   FutureOr<void> onNewChatClickedEvent(
-      NewChatClickedEvent event, Emitter<ChatState> emit) {
+      NewChatClickedEvent event, Emitter<ChatState> emit) async {
+    var data = await chatRepository.createChat(event.user.id, event.chatName);
     emit(NewChatCreatedState(
         chat: ChatModel(
-            id: 10,
-            chatName: event.chatName,
+            id: data.id,
+            chatName: data.chatName,
             chatMessages: [],
             reference: [])));
   }

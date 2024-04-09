@@ -3,6 +3,7 @@ import 'package:doc_probe_assist/features/chat/repository/chat_repository.dart';
 import 'package:doc_probe_assist/models/chat_message_model.dart';
 import 'package:doc_probe_assist/models/chat_model.dart';
 import 'package:doc_probe_assist/models/document_model.dart';
+// import 'package:doc_probe_assist/models/user_model.dart';
 import 'package:doc_probe_assist/service_locator.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
@@ -27,6 +28,8 @@ class ChatWidget extends StatelessWidget {
     int? selectedDocument;
     List<Document> documents = [];
     ScrollController scrollController = ScrollController();
+
+    // UserModel? user;
     return BlocConsumer<ChatBloc, ChatState>(
       bloc: chatBloc,
       listener: (context, state) {
@@ -38,6 +41,7 @@ class ChatWidget extends StatelessWidget {
         if (state is ChatPageLoadingSuccessState) {
           chats = List.from(state.chats);
           documents = state.documents;
+          // user = state.user;
         } else if (state is ChangeChatState) {
           messages = chats[state.index].chatMessages;
           index = state.index;

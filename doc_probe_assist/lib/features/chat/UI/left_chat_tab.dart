@@ -69,7 +69,8 @@ class LeftChatTab extends StatelessWidget {
                           TextButton(
                               onPressed: () {
                                 chatBloc.add(NewChatClickedEvent(
-                                    chatName: textEditingController.text));
+                                    chatName: textEditingController.text,
+                                    user: user!));
                                 textEditingController.text = "";
                                 Navigator.of(context).pop();
                               },

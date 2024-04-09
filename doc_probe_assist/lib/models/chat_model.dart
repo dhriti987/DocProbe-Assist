@@ -13,4 +13,13 @@ class ChatModel {
     required this.chatMessages,
     required this.reference,
   });
+
+  factory ChatModel.fromJson(Map<String, dynamic> json) => ChatModel(
+      id: json['id'],
+      chatName: json['name'],
+      chatMessages: ChatMessage.listFromJson(json['queries']),
+      reference: Reference.listFromJson(json['reference']));
+
+  static List<ChatModel> listFromJson(List<dynamic> data) =>
+      List.from(data.map((e) => ChatModel.fromJson(e)));
 }

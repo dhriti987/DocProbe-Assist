@@ -9,8 +9,9 @@ class FetchDataEvent extends ChatEvent {}
 
 class NewChatClickedEvent extends ChatEvent {
   final String chatName;
+  final UserModel user;
 
-  NewChatClickedEvent({required this.chatName});
+  NewChatClickedEvent({required this.chatName, required this.user});
 }
 
 class ChatTileClickedEvent extends ChatEvent {
