@@ -32,11 +32,17 @@ class LoginPage extends StatelessWidget {
           if (state is LoginSuccessfull) {
             context.go('/chat');
           } else if (state is LoginFailed) {
-            print('Error');
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: Text(state.title),
+                content: Text(state.message),
+              ),
+            );
           }
         },
         child: Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [
                 Color(0xff0b74b0),
@@ -53,7 +59,7 @@ class LoginPage extends StatelessWidget {
               Expanded(
                 flex: 2,
                 child: Container(
-                  padding: EdgeInsets.all(20.0),
+                  padding: const EdgeInsets.all(20.0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,7 +72,7 @@ class LoginPage extends StatelessWidget {
                               animatedTexts: [
                                 TyperAnimatedText(
                                   'Simplifying Docs, Amplifying Answers ',
-                                  textStyle: TextStyle(
+                                  textStyle: const TextStyle(
                                     fontSize: 24,
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
@@ -74,7 +80,7 @@ class LoginPage extends StatelessWidget {
                                 ),
                                 TyperAnimatedText(
                                   'Whizzing through documents for you.',
-                                  textStyle: TextStyle(
+                                  textStyle: const TextStyle(
                                     fontSize: 24,
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
@@ -83,7 +89,7 @@ class LoginPage extends StatelessWidget {
                               ],
                               isRepeatingAnimation: true,
                               totalRepeatCount: 10,
-                              pause: Duration(milliseconds: 1000),
+                              pause: const Duration(milliseconds: 1000),
                             ),
                           ),
                         ],
@@ -97,7 +103,7 @@ class LoginPage extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(30.0),
                   child: Container(
-                    padding: EdgeInsets.all(40.0),
+                    padding: const EdgeInsets.all(40.0),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(10.0),
@@ -106,7 +112,7 @@ class LoginPage extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        const Text(
                           'Login Form',
                           style: TextStyle(
                             color: Colors.black,
@@ -114,26 +120,26 @@ class LoginPage extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(height: 30.0),
+                        const SizedBox(height: 30.0),
                         TextField(
                           controller: empIdController,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             labelText: 'Employee ID',
                             fillColor: Colors.white,
                             filled: true,
                           ),
                         ),
-                        SizedBox(height: 20.0),
+                        const SizedBox(height: 20.0),
                         TextField(
                           controller: passwordController,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             labelText: 'Password',
                             fillColor: Colors.white,
                             filled: true,
                           ),
                           obscureText: true,
                         ),
-                        SizedBox(height: 40.0),
+                        const SizedBox(height: 40.0),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -144,17 +150,20 @@ class LoginPage extends StatelessWidget {
                                     empId: empIdController.text,
                                     password: passwordController.text));
                               },
-                              child: Text('Login'),
                               style: ElevatedButton.styleFrom(
-                                padding: EdgeInsets.symmetric(
+                                padding: const EdgeInsets.symmetric(
                                   vertical: 15.0,
                                   horizontal: 30.0,
                                 ),
                               ),
+                              child: const Text('Login',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontFamily: 'Adani')),
                             ),
                             TextButton(
                               onPressed: () {},
-                              child: Text(
+                              child: const Text(
                                 "Forgot Password?",
                                 style: TextStyle(
                                   color: Colors.purple, // Change to purple
@@ -163,20 +172,20 @@ class LoginPage extends StatelessWidget {
                             ),
                           ],
                         ),
-                        SizedBox(height: 10.0),
+                        const SizedBox(height: 10.0),
                         Expanded(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              Spacer(),
+                              const Spacer(),
                               Container(
-                                padding: EdgeInsets.only(bottom: 0.0),
+                                padding: const EdgeInsets.only(bottom: 0.0),
                                 alignment: Alignment.bottomCenter,
                                 child: TextButton(
                                   onPressed: () {
                                     context.go('/register');
                                   },
-                                  child: Text(
+                                  child: const Text(
                                     "Don't have an account? Register",
                                     style: TextStyle(
                                       color: Colors.purple, // Change to purple

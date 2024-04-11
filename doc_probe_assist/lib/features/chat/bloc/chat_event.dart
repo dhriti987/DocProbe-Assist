@@ -22,8 +22,9 @@ class ChatTileClickedEvent extends ChatEvent {
 
 class DeleteChatOptionClickedEvent extends ChatEvent {
   final int index;
+  final int chatId;
 
-  DeleteChatOptionClickedEvent({required this.index});
+  DeleteChatOptionClickedEvent({required this.index, required this.chatId});
 }
 
 class RenameChatOptionClickedEvent extends ChatEvent {

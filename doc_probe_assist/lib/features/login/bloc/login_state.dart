@@ -7,6 +7,11 @@ sealed class LohinActionState extends LoginState {}
 
 final class LoginInitial extends LoginState {}
 
-final class LoginFailed extends LohinActionState {}
+final class LoginFailed extends LohinActionState {
+  final String title;
+  final String message;
+
+  LoginFailed({required this.title, required this.message});
+}
 
 final class LoginSuccessfull extends LohinActionState {}

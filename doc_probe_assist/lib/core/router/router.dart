@@ -7,6 +7,7 @@ import 'package:doc_probe_assist/features/home/UI/home_page.dart';
 import 'package:doc_probe_assist/features/login/UI/login_page.dart';
 import 'package:doc_probe_assist/features/register/UI/register_page.dart';
 import 'package:doc_probe_assist/features/settings/UI/settings_page.dart';
+import 'package:doc_probe_assist/models/user_model.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -54,7 +55,9 @@ class AppRouter {
         GoRoute(
           path: '/admin',
           name: 'Admin',
-          builder: (context, state) => const AdminPage(),
+          builder: (context, state) => AdminPage(
+            user: state.extra as UserModel,
+          ),
         ),
         GoRoute(
           path: '/settings',

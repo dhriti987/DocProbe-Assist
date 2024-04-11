@@ -20,10 +20,22 @@ class LeftChatTab extends StatelessWidget {
     UserModel? user;
     return BlocConsumer<ChatBloc, ChatState>(
       bloc: chatBloc,
-      listener: (context, state) {},
+      listenWhen: (previous, current) => current is ChatActionState,
+      buildWhen: (previous, current) => current is! ChatActionState,
+      listener: (context, state) {
+        if (state is ChatErrorState) {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text(state.title),
+              content: Text(state.message),
+            ),
+          );
+        }
+      },
       builder: (context, state) {
         if (state is ChatPageLoadingSuccessState) {
-          chats = List.from(state.chats);
+          chats = state.chats;
           user = state.user;
         } else if (state is NewChatCreatedState) {
           chats.add(state.chat);
@@ -45,8 +57,7 @@ class LeftChatTab extends StatelessWidget {
           child: Column(
             children: [
               UserWidget(
-                name: user?.name ?? "Unknown User",
-                isAdmin: user?.isAdmin ?? false,
+                user: user,
                 onLogout: () => chatBloc.add(LogoutButtonClickedEvent()),
               ),
               InkWell(
@@ -55,7 +66,7 @@ class LeftChatTab extends StatelessWidget {
                     context: context,
                     builder: (context) {
                       return AlertDialog(
-                        title: Text("New Chat"),
+                        title: const Text("New Chat"),
                         content: SizedBox(
                           width: 300,
                           child: TextField(
@@ -123,21 +134,16 @@ class LeftChatTab extends StatelessWidget {
 }
 
 class UserWidget extends StatelessWidget {
-  const UserWidget(
-      {super.key,
-      required this.name,
-      required this.isAdmin,
-      required this.onLogout});
+  const UserWidget({super.key, required this.user, required this.onLogout});
 
-  final String name;
-  final bool isAdmin;
+  final UserModel? user;
   final void Function() onLogout;
 
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton(
       offset: const Offset(20, 40),
-      tooltip: name,
+      tooltip: user?.name,
       padding: EdgeInsets.zero,
       child: Padding(
         padding: const EdgeInsets.all(15),
@@ -149,7 +155,7 @@ class UserWidget extends StatelessWidget {
               backgroundColor: Colors.lightBlue,
               child: Center(
                   child: Text(
-                name[0],
+                user?.name[0] ?? "Unknown User",
                 style: const TextStyle(fontWeight: FontWeight.w900),
                 overflow: TextOverflow.fade,
               )),
@@ -159,7 +165,7 @@ class UserWidget extends StatelessWidget {
             ),
             Expanded(
               child: Text(
-                name,
+                user?.name ?? "Unknown User",
                 maxLines: 1,
                 style: Theme.of(context).textTheme.titleMedium,
                 overflow: TextOverflow.ellipsis,
@@ -184,11 +190,11 @@ class UserWidget extends StatelessWidget {
           //   ),
           // ),
           PopupMenuItem(
-            enabled: isAdmin,
-            onTap: () => context.push('/admin'),
+            enabled: user?.isAdmin ?? false,
+            onTap: () => context.push('/admin', extra: user),
             child: Text(
               "Admin Panel",
-              style: isAdmin
+              style: (user?.isAdmin ?? false)
                   ? Theme.of(context).textTheme.labelMedium
                   : Theme.of(context)
                       .textTheme
@@ -269,8 +275,32 @@ class _ChatTileState extends State<ChatTile>
             itemBuilder: (context) {
               return [
                 PopupMenuItem(
-                  onTap: () => widget.chatBloc
-                      .add(DeleteChatOptionClickedEvent(index: widget.index)),
+                  onTap: () => showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text("Delete Chat"),
+                      content: Text(
+                          "Sure want to Delete Chat ${widget.chat.chatName}?"),
+                      actions: [
+                        ElevatedButton(
+                            onPressed: () {
+                              widget.chatBloc.add(DeleteChatOptionClickedEvent(
+                                  index: widget.index, chatId: widget.chat.id));
+                              context.pop();
+                            },
+                            child: const Text(
+                              "Delete",
+                              style: TextStyle(color: Colors.white),
+                            )),
+                        ElevatedButton(
+                            onPressed: () => context.pop(),
+                            child: const Text(
+                              "Cancel",
+                              style: TextStyle(color: Colors.white),
+                            ))
+                      ],
+                    ),
+                  ),
                   child: Text(
                     "Delete",
                     style: Theme.of(context).textTheme.labelMedium,
@@ -283,7 +313,7 @@ class _ChatTileState extends State<ChatTile>
                       context: context,
                       builder: (context) {
                         return AlertDialog(
-                          title: Text("Update Chat"),
+                          title: const Text("Update Chat"),
                           content: SizedBox(
                             width: 300,
                             child: TextField(

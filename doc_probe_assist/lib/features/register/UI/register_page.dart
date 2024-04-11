@@ -24,23 +24,29 @@ class RegisterPage extends StatelessWidget {
       bloc: registerBloc,
       buildWhen: (previous, current) => current is! RegisterActionState,
       listenWhen: (previous, current) => current is RegisterActionState,
-      listener: (context, state) {},
-      builder: (context, state) {
-        if (state is RegisterLoadingState) {
-          return Center(child: CircularProgressIndicator());
-        } else if (state is RegisterLoadingSuccessState) {
+      listener: (context, state) {
+        if (state is RegisterLoadingSuccessState) {
           context.go('/login');
         } else if (state is RegisterLoadingFailedState) {
-          return AlertDialog(
-            content: Text('Something went wrong. Please Try again later.'),
-            actions: [
-              ElevatedButton(
-                  onPressed: () {
-                    context.pop();
-                  },
-                  child: Text('Ok'))
-            ],
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text(state.title),
+              content: Text(state.message),
+              actions: [
+                ElevatedButton(
+                    onPressed: () {
+                      context.pop();
+                    },
+                    child: const Text('Ok'))
+              ],
+            ),
           );
+        }
+      },
+      builder: (context, state) {
+        if (state is RegisterLoadingState) {
+          return const Center(child: CircularProgressIndicator());
         }
         return Scaffold(
           appBar: AppBar(
@@ -55,7 +61,7 @@ class RegisterPage extends StatelessWidget {
             ),
           ),
           body: Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               gradient: LinearGradient(
                 colors: [
                   Color(0xff0b74b0),
@@ -72,7 +78,7 @@ class RegisterPage extends StatelessWidget {
                 Expanded(
                   flex: 2,
                   child: Container(
-                    padding: EdgeInsets.all(20.0),
+                    padding: const EdgeInsets.all(20.0),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -85,7 +91,7 @@ class RegisterPage extends StatelessWidget {
                                 animatedTexts: [
                                   TyperAnimatedText(
                                     'Simplifying Docs, Amplifying Answers! ',
-                                    textStyle: TextStyle(
+                                    textStyle: const TextStyle(
                                       fontSize: 24,
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
@@ -93,7 +99,7 @@ class RegisterPage extends StatelessWidget {
                                   ),
                                   TyperAnimatedText(
                                     'Whizzing through documents for you...',
-                                    textStyle: TextStyle(
+                                    textStyle: const TextStyle(
                                       fontSize: 24,
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
@@ -102,7 +108,7 @@ class RegisterPage extends StatelessWidget {
                                 ],
                                 isRepeatingAnimation: true,
                                 totalRepeatCount: 10,
-                                pause: Duration(milliseconds: 1000),
+                                pause: const Duration(milliseconds: 1000),
                               ),
                             ),
                           ],
@@ -116,7 +122,7 @@ class RegisterPage extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.all(30.0),
                     child: Container(
-                      padding: EdgeInsets.all(40.0),
+                      padding: const EdgeInsets.all(40.0),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(10.0),
@@ -126,7 +132,7 @@ class RegisterPage extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
+                            const Text(
                               'Register Form',
                               style: TextStyle(
                                 color: Colors.black,
@@ -134,10 +140,10 @@ class RegisterPage extends StatelessWidget {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            SizedBox(height: 20.0),
+                            const SizedBox(height: 20.0),
                             TextField(
                               controller: nameTextEditingController,
-                              decoration: InputDecoration(
+                              decoration: const InputDecoration(
                                 labelText: 'Name',
                                 fillColor: Colors.white,
                                 filled: true,
@@ -145,10 +151,10 @@ class RegisterPage extends StatelessWidget {
                                     EdgeInsets.symmetric(vertical: 8.0),
                               ),
                             ),
-                            SizedBox(height: 20.0),
+                            const SizedBox(height: 20.0),
                             TextField(
                               controller: empIdTextEditingController,
-                              decoration: InputDecoration(
+                              decoration: const InputDecoration(
                                 labelText: 'Employee ID',
                                 fillColor: Colors.white,
                                 filled: true,
@@ -156,10 +162,10 @@ class RegisterPage extends StatelessWidget {
                                     EdgeInsets.symmetric(vertical: 8.0),
                               ),
                             ),
-                            SizedBox(height: 20.0),
+                            const SizedBox(height: 20.0),
                             TextField(
                               controller: emailTextEditingController,
-                              decoration: InputDecoration(
+                              decoration: const InputDecoration(
                                 labelText: 'Email',
                                 fillColor: Colors.white,
                                 filled: true,
@@ -167,10 +173,10 @@ class RegisterPage extends StatelessWidget {
                                     EdgeInsets.symmetric(vertical: 8.0),
                               ),
                             ),
-                            SizedBox(height: 20.0),
+                            const SizedBox(height: 20.0),
                             TextField(
                               controller: passwordTextEditingController,
-                              decoration: InputDecoration(
+                              decoration: const InputDecoration(
                                 labelText: 'Password',
                                 fillColor: Colors.white,
                                 filled: true,
@@ -179,10 +185,10 @@ class RegisterPage extends StatelessWidget {
                               ),
                               obscureText: true,
                             ),
-                            SizedBox(height: 20.0),
+                            const SizedBox(height: 20.0),
                             TextField(
                               controller: confirmPasswordTextEditingController,
-                              decoration: InputDecoration(
+                              decoration: const InputDecoration(
                                 labelText: 'Confirm Password',
                                 fillColor: Colors.white,
                                 filled: true,
@@ -191,7 +197,7 @@ class RegisterPage extends StatelessWidget {
                               ),
                               obscureText: true,
                             ),
-                            SizedBox(height: 30.0),
+                            const SizedBox(height: 30.0),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -217,9 +223,9 @@ class RegisterPage extends StatelessWidget {
                                     // sl.get<RegisterRepository>().register(
                                     //     "abd", "cdd", "ab@mail.com", "mnbv9876");
                                   },
-                                  child: Text('Register Request'),
+                                  child: const Text('Register Request'),
                                   style: ElevatedButton.styleFrom(
-                                    padding: EdgeInsets.symmetric(
+                                    padding: const EdgeInsets.symmetric(
                                       vertical: 16.0,
                                       horizontal: 30.0,
                                     ),
@@ -229,7 +235,7 @@ class RegisterPage extends StatelessWidget {
                                   onPressed: () {
                                     context.go('/login');
                                   },
-                                  child: Text(
+                                  child: const Text(
                                     "Already have an account? Sign in",
                                     style: TextStyle(
                                       color: Colors.purple,

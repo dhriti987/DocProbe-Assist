@@ -6,14 +6,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 class UserScreen extends StatelessWidget {
-  const UserScreen({super.key});
+  const UserScreen({super.key, required this.currentUser});
+
+  final UserModel currentUser;
 
   @override
   Widget build(BuildContext context) {
     final adminBloc = sl.get<AdminBloc>();
     List<UserModel> users = [];
     return Padding(
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
       child: BlocConsumer<AdminBloc, AdminState>(
         bloc: adminBloc,
         buildWhen: (previous, current) => current is! AdminActionState,
@@ -23,11 +25,11 @@ class UserScreen extends StatelessWidget {
           if (state is AdminInitial) {
             adminBloc.add(UsersFetchEvent());
           } else if (state is UserLoadingState) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (state is UserLoadingSuccessState) {
             users = state.users;
           } else if (state is UserLoadingFailedState) {
-            return Dialog(
+            return const Dialog(
               child: Text("Error"),
             );
           } else if (state is UpdateUserState) {
@@ -65,7 +67,7 @@ class UserScreen extends StatelessWidget {
                   .asMap()
                   .entries
                   .map((e) => DataRow(cells: [
-                        DataCell(Text(e.key.toString())),
+                        DataCell(Text((e.key + 1).toString())),
                         DataCell(Text(e.value.username)),
                         DataCell(Text(e.value.name)),
                         DataCell(Text(e.value.email)),
@@ -76,154 +78,179 @@ class UserScreen extends StatelessWidget {
                                   e.value.isAdmin ? Colors.green : Colors.grey),
                         )),
                         DataCell(Row(
-                          children: [
-                            IconButton(
-                              tooltip: e.value.isAdmin
-                                  ? "Revoke Admin Access"
-                                  : "Give Admin Access",
-                              onPressed: () {
-                                showDialog(
-                                    context: context,
-                                    builder: (_) => AlertDialog(
-                                          title: Text('Admin Access'),
-                                          content: e.value.isAdmin
-                                              ? Text(
-                                                  'Revoke admin access from ${e.value.name}(${e.value.username})?')
-                                              : Text(
-                                                  'Give admin access to ${e.value.name}(${e.value.username})?'),
-                                          actions: [
-                                            ElevatedButton(
-                                                style: ElevatedButton.styleFrom(
-                                                    backgroundColor:
-                                                        Colors.grey[200]),
-                                                onPressed: () {
-                                                  e.value.isAdmin
-                                                      ? adminBloc.add(
-                                                          RevokeAdminAcessUserEvent(
-                                                              user: e.value))
-                                                      : adminBloc.add(
-                                                          GiveAdminAcessUserEvent(
-                                                              user: e.value));
-                                                  context.pop();
-                                                },
-                                                child: Text('Yes')),
-                                            ElevatedButton(
-                                                style: ElevatedButton.styleFrom(
-                                                    backgroundColor:
-                                                        Colors.grey[200]),
-                                                onPressed: () {
-                                                  context.pop();
-                                                },
-                                                child: Text('No')),
-                                          ],
-                                        ));
+                          children: currentUser.id == e.value.id
+                              ? []
+                              : [
+                                  IconButton(
+                                    tooltip: e.value.isAdmin
+                                        ? "Revoke Admin Access"
+                                        : "Give Admin Access",
+                                    onPressed: () {
+                                      showDialog(
+                                          context: context,
+                                          builder: (_) => AlertDialog(
+                                                title:
+                                                    const Text('Admin Access'),
+                                                content: e.value.isAdmin
+                                                    ? Text(
+                                                        'Revoke admin access from ${e.value.name}(${e.value.username})?')
+                                                    : Text(
+                                                        'Give admin access to ${e.value.name}(${e.value.username})?'),
+                                                actions: [
+                                                  ElevatedButton(
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                              backgroundColor:
+                                                                  Colors.grey[
+                                                                      200]),
+                                                      onPressed: () {
+                                                        e.value.isAdmin
+                                                            ? adminBloc.add(
+                                                                RevokeAdminAcessUserEvent(
+                                                                    user: e
+                                                                        .value))
+                                                            : adminBloc.add(
+                                                                GiveAdminAcessUserEvent(
+                                                                    user: e
+                                                                        .value));
+                                                        context.pop();
+                                                      },
+                                                      child: const Text('Yes')),
+                                                  ElevatedButton(
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                              backgroundColor:
+                                                                  Colors.grey[
+                                                                      200]),
+                                                      onPressed: () {
+                                                        context.pop();
+                                                      },
+                                                      child: const Text('No')),
+                                                ],
+                                              ));
 
-                                // e.value.isAdmin
-                                //     ? adminBloc.add(RevokeAdminAcessUserEvent(
-                                //         user: e.value))
-                                //     : adminBloc.add(
-                                //         GiveAdminAcessUserEvent(user: e.value));
-                              },
-                              icon: Icon(
-                                Icons.admin_panel_settings_rounded,
-                                color:
-                                    e.value.isAdmin ? Colors.red : Colors.green,
-                              ),
-                            ),
-                            IconButton(
-                              tooltip: e.value.isActive
-                                  ? "Block User"
-                                  : "Unblock User",
-                              onPressed: () {
-                                showDialog(
-                                    context: context,
-                                    builder: (_) => AlertDialog(
-                                          content: e.value.isActive
-                                              ? Text(
-                                                  'You want to block ${e.value.name} (${e.value.username}). Are you sure?')
-                                              : Text(
-                                                  'You want to unblock ${e.value.name} (${e.value.username}). Are you sure?'),
-                                          actions: [
-                                            ElevatedButton(
-                                                style: ElevatedButton.styleFrom(
-                                                    backgroundColor:
-                                                        Colors.grey[200]),
-                                                onPressed: () {
-                                                  e.value.isActive
-                                                      ? adminBloc.add(
-                                                          BlockUserEvent(
-                                                              user: e.value))
-                                                      : adminBloc.add(
-                                                          UnBlockUserEvent(
-                                                              user: e.value));
-                                                  context.pop();
-                                                },
-                                                child: e.value.isActive
-                                                    ? Text('Block')
-                                                    : Text('Unblock')),
-                                            ElevatedButton(
-                                                style: ElevatedButton.styleFrom(
-                                                    backgroundColor:
-                                                        Colors.grey[200]),
-                                                onPressed: () {
-                                                  context.pop();
-                                                },
-                                                child: Text('Cancle')),
-                                          ],
-                                        ));
+                                      // e.value.isAdmin
+                                      //     ? adminBloc.add(RevokeAdminAcessUserEvent(
+                                      //         user: e.value))
+                                      //     : adminBloc.add(
+                                      //         GiveAdminAcessUserEvent(user: e.value));
+                                    },
+                                    icon: Icon(
+                                      Icons.admin_panel_settings_rounded,
+                                      color: e.value.isAdmin
+                                          ? Colors.red
+                                          : Colors.green,
+                                    ),
+                                  ),
+                                  IconButton(
+                                    tooltip: e.value.isActive
+                                        ? "Block User"
+                                        : "Unblock User",
+                                    onPressed: () {
+                                      showDialog(
+                                          context: context,
+                                          builder: (_) => AlertDialog(
+                                                content: e.value.isActive
+                                                    ? Text(
+                                                        'You want to block ${e.value.name} (${e.value.username}). Are you sure?')
+                                                    : Text(
+                                                        'You want to unblock ${e.value.name} (${e.value.username}). Are you sure?'),
+                                                actions: [
+                                                  ElevatedButton(
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                              backgroundColor:
+                                                                  Colors.grey[
+                                                                      200]),
+                                                      onPressed: () {
+                                                        e.value.isActive
+                                                            ? adminBloc.add(
+                                                                BlockUserEvent(
+                                                                    user: e
+                                                                        .value))
+                                                            : adminBloc.add(
+                                                                UnBlockUserEvent(
+                                                                    user: e
+                                                                        .value));
+                                                        context.pop();
+                                                      },
+                                                      child: e.value.isActive
+                                                          ? const Text('Block')
+                                                          : const Text(
+                                                              'Unblock')),
+                                                  ElevatedButton(
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                              backgroundColor:
+                                                                  Colors.grey[
+                                                                      200]),
+                                                      onPressed: () {
+                                                        context.pop();
+                                                      },
+                                                      child:
+                                                          const Text('Cancle')),
+                                                ],
+                                              ));
 
-                                // e.value.isActive
-                                //     ? adminBloc
-                                //         .add(BlockUserEvent(user: e.value))
-                                //     : adminBloc
-                                //         .add(UnBlockUserEvent(user: e.value));
-                              },
-                              icon: Icon(
-                                e.value.isActive
-                                    ? Icons.person_off_rounded
-                                    : Icons.person,
-                                color: e.value.isActive
-                                    ? Colors.red
-                                    : Colors.green,
-                              ),
-                            ),
-                            IconButton(
-                              tooltip: "Delete User",
-                              onPressed: () {
-                                showDialog(
-                                    context: context,
-                                    builder: (_) => AlertDialog(
-                                          title: Text('Delete User'),
-                                          content: Text(
-                                              'Are you sure you want to delete ${e.value.name}(${e.value.username})?'),
-                                          actions: [
-                                            ElevatedButton(
-                                                style: ElevatedButton.styleFrom(
-                                                    backgroundColor:
-                                                        Colors.red[200]),
-                                                onPressed: () {
-                                                  adminBloc.add(DeleteUserEvent(
-                                                      user: e.value));
-                                                  context.pop();
-                                                },
-                                                child: Text('Delete')),
-                                            ElevatedButton(
-                                                style: ElevatedButton.styleFrom(
-                                                    backgroundColor:
-                                                        Colors.grey[200]),
-                                                onPressed: () {
-                                                  context.pop();
-                                                },
-                                                child: Text('No')),
-                                          ],
-                                        ));
-                              },
-                              icon: Icon(
-                                Icons.delete_forever,
-                                color: Colors.redAccent,
-                              ),
-                            ),
-                          ],
+                                      // e.value.isActive
+                                      //     ? adminBloc
+                                      //         .add(BlockUserEvent(user: e.value))
+                                      //     : adminBloc
+                                      //         .add(UnBlockUserEvent(user: e.value));
+                                    },
+                                    icon: Icon(
+                                      e.value.isActive
+                                          ? Icons.person_off_rounded
+                                          : Icons.person,
+                                      color: e.value.isActive
+                                          ? Colors.red
+                                          : Colors.green,
+                                    ),
+                                  ),
+                                  IconButton(
+                                    tooltip: "Delete User",
+                                    onPressed: () {
+                                      showDialog(
+                                          context: context,
+                                          builder: (_) => AlertDialog(
+                                                title:
+                                                    const Text('Delete User'),
+                                                content: Text(
+                                                    'Are you sure you want to delete ${e.value.name}(${e.value.username})?'),
+                                                actions: [
+                                                  ElevatedButton(
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                              backgroundColor:
+                                                                  Colors.red[
+                                                                      200]),
+                                                      onPressed: () {
+                                                        adminBloc.add(
+                                                            DeleteUserEvent(
+                                                                user: e.value));
+                                                        context.pop();
+                                                      },
+                                                      child:
+                                                          const Text('Delete')),
+                                                  ElevatedButton(
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                              backgroundColor:
+                                                                  Colors.grey[
+                                                                      200]),
+                                                      onPressed: () {
+                                                        context.pop();
+                                                      },
+                                                      child: const Text('No')),
+                                                ],
+                                              ));
+                                    },
+                                    icon: const Icon(
+                                      Icons.delete_forever,
+                                      color: Colors.redAccent,
+                                    ),
+                                  ),
+                                ],
                         )),
                       ]))
                   .toList(),

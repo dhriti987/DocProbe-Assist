@@ -9,7 +9,7 @@ class RegisterRepository {
 
   Future<void> register(
       String name, String empID, String email, String password) async {
-    final api = apiService.getApi();
+    final api = apiService.getApiWithoutHeader();
     FormData data = FormData.fromMap({
       "name": name,
       "email": email,
@@ -19,8 +19,14 @@ class RegisterRepository {
     try {
       await api.post(registerURL, data: data);
     } on DioException catch (e) {
-      throw ApiException(
-          exception: e, error: ["Unexpected error", "Please try again later."]);
+      print(e.response);
+      throw ApiException(exception: e, error: [
+        "Unexpected error",
+        (e.response?.data as Map<String, dynamic>)
+            .values
+            .map((e) => e[0])
+            .join('\n')
+      ]);
       // print(e.response?.data);
     }
   }

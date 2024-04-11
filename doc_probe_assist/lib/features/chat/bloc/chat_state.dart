@@ -47,3 +47,10 @@ class NewChatMessageState extends ChatState {
 }
 
 class LogoutState extends ChatActionState {}
+
+class ChatErrorState extends ChatActionState {
+  final String title;
+  final String message;
+
+  ChatErrorState({required this.title, required this.message});
+}

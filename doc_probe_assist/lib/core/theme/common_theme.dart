@@ -5,7 +5,9 @@ ThemeData lightTheme = ThemeData(
   appBarTheme: const AppBarTheme(centerTitle: true, color: Colors.transparent),
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF75479C), shape: const StadiumBorder()),
+        backgroundColor: const Color(0xFF75479C),
+        shape: const StadiumBorder(),
+        textStyle: TextStyle(color: Colors.white)),
   ),
   inputDecorationTheme: const InputDecorationTheme(
       hintStyle: TextStyle(color: Colors.black26, fontSize: 16)),
