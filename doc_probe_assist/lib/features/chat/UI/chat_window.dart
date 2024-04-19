@@ -1,13 +1,12 @@
 import 'package:doc_probe_assist/features/chat/bloc/chat_bloc.dart';
-import 'package:doc_probe_assist/features/chat/repository/chat_repository.dart';
 import 'package:doc_probe_assist/models/chat_message_model.dart';
 import 'package:doc_probe_assist/models/chat_model.dart';
 import 'package:doc_probe_assist/models/document_model.dart';
 // import 'package:doc_probe_assist/models/user_model.dart';
-import 'package:doc_probe_assist/service_locator.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:typewritertext/typewritertext.dart';
 
@@ -28,6 +27,7 @@ class ChatWidget extends StatelessWidget {
     int? selectedDocument;
     List<Document> documents = [];
     ScrollController scrollController = ScrollController();
+    bool sendChat = true;
 
     // UserModel? user;
     return BlocConsumer<ChatBloc, ChatState>(
@@ -35,6 +35,50 @@ class ChatWidget extends StatelessWidget {
       listener: (context, state) {
         if (state is LogoutState) {
           context.go('/');
+        }
+        if (state is FeedbackSuccessState) {
+          showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  content: Text('Feedback successfully added.'),
+                  actions: [
+                    ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text(
+                          'Ok',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium
+                              ?.copyWith(fontSize: 10),
+                        ))
+                  ],
+                );
+              });
+        }
+        if (state is FeedbackFailedState) {
+          showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  content: Text(state.message),
+                  actions: [
+                    ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text(
+                          'Ok',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium
+                              ?.copyWith(fontSize: 10),
+                        ))
+                  ],
+                );
+              });
         }
       },
       builder: (context, state) {
@@ -52,6 +96,8 @@ class ChatWidget extends StatelessWidget {
         } else if (state is NewChatMessageState) {
           int chatIndex = chats
               .indexWhere((element) => element.id == state.chatMessage.chatId);
+
+          sendChat = true;
           if (state.chatMessage.id != -1) {
             chats[chatIndex].chatMessages[chats[chatIndex]
                 .chatMessages
@@ -59,6 +105,14 @@ class ChatWidget extends StatelessWidget {
           } else {
             chats[chatIndex].chatMessages.add(state.chatMessage);
           }
+        } else if (state is RegenerateAnswerState) {
+          int chatIndex = chats
+              .indexWhere((element) => element.id == state.chatMessage.chatId);
+          chats[chatIndex].chatMessages[chats[chatIndex]
+                  .chatMessages
+                  .indexWhere(
+                      (element) => element.id == state.chatMessage.id)] =
+              state.chatMessage;
         }
         Future.delayed(const Duration(milliseconds: 100), () {
           scrollController.animateTo(scrollController.position.maxScrollExtent,
@@ -118,7 +172,8 @@ class ChatWidget extends StatelessWidget {
                         controller: scrollController,
                         shrinkWrap: true,
                         children: messages
-                            .map((e) => createChatMessageWidget(context, e))
+                            .map((e) =>
+                                createChatMessageWidget(context, e, chatBloc))
                             .toList(),
                       ),
                     ),
@@ -135,13 +190,15 @@ class ChatWidget extends StatelessWidget {
                         ),
                         suffixIcon: IconButton(
                           onPressed: () {
-                            sl.get<ChatRepository>().getAllDocuments();
-                            if (index != null) {
+                            if (index != null &&
+                                sendChat &&
+                                textEditingController.text.isNotEmpty) {
                               chatBloc.add(ResolveQueryEvent(
                                   chatIndex: chats[index!].id,
                                   query: textEditingController.text,
                                   docId: selectedDocument));
                               textEditingController.text = "";
+                              sendChat = false;
                             }
                           },
                           icon: const Icon(Icons.arrow_upward_rounded),
@@ -166,7 +223,12 @@ class ChatWidget extends StatelessWidget {
   }
 
   Widget createChatMessageWidget(
-      BuildContext context, ChatMessage chatMessage) {
+      BuildContext context, ChatMessage chatMessage, ChatBloc chatBloc) {
+    TextEditingController feedbackEditingController = TextEditingController();
+    TextEditingController expectedResponseEditingController =
+        TextEditingController();
+
+    double _rating = 3;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -228,13 +290,175 @@ class ChatWidget extends StatelessWidget {
                           "assets/animations/robo_thinking.gif",
                           height: 100,
                         )
-                      : TypeWriterText(
-                          text: Text(
-                            chatMessage.response,
-                            style: Theme.of(context).textTheme.bodyMedium,
-                          ),
-                          duration: const Duration(milliseconds: 1),
-                          play: toAnimate(chatMessage),
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            TypeWriterText(
+                              alignment: Alignment.bottomLeft,
+                              text: Text(
+                                chatMessage.response,
+                                style: Theme.of(context).textTheme.bodyMedium,
+                              ),
+                              duration: const Duration(milliseconds: 1),
+                              play: toAnimate(chatMessage),
+                            ),
+                            Row(children: [
+                              IconButton(
+                                onPressed: () {
+                                  chatBloc.add(RegenerateResponseEvent(
+                                      chatMessage: chatMessage));
+                                },
+                                icon: Icon(
+                                  Icons.replay_rounded,
+                                ),
+                              ),
+                              SizedBox(
+                                width: 50,
+                                height: 10,
+                              ),
+                              IconButton(
+                                  onPressed: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return AlertDialog(
+                                          title: const Text("Feedback"),
+                                          content: SizedBox(
+                                            width: 300,
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                RatingBar.builder(
+                                                  initialRating: _rating,
+                                                  itemCount: 5,
+                                                  itemBuilder:
+                                                      (context, index) {
+                                                    switch (index) {
+                                                      case 0:
+                                                        return Icon(
+                                                          Icons
+                                                              .sentiment_very_dissatisfied,
+                                                          color: Colors.red,
+                                                        );
+                                                      case 1:
+                                                        return Icon(
+                                                          Icons
+                                                              .sentiment_dissatisfied,
+                                                          color:
+                                                              Colors.redAccent,
+                                                        );
+                                                      case 2:
+                                                        return Icon(
+                                                          Icons
+                                                              .sentiment_neutral,
+                                                          color: Colors.amber,
+                                                        );
+                                                      case 3:
+                                                        return Icon(
+                                                          Icons
+                                                              .sentiment_satisfied,
+                                                          color:
+                                                              Colors.lightGreen,
+                                                        );
+                                                      case 4:
+                                                        return Icon(
+                                                          Icons
+                                                              .sentiment_very_satisfied,
+                                                          color: Colors.green,
+                                                        );
+                                                    }
+
+                                                    return Text('');
+                                                  },
+                                                  onRatingUpdate: (rating) {
+                                                    chatBloc.add(
+                                                        RatingChangedEvent(
+                                                            rating: rating));
+                                                  },
+                                                ),
+                                                SizedBox(
+                                                  height: 20,
+                                                ),
+                                                TextField(
+                                                  decoration: InputDecoration(
+                                                    labelText:
+                                                        "Enter feedback:",
+                                                    border: OutlineInputBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                    ),
+                                                  ),
+                                                  maxLines: 5,
+                                                  controller:
+                                                      feedbackEditingController,
+                                                ),
+                                                SizedBox(
+                                                  height: 20,
+                                                ),
+                                                BlocBuilder(
+                                                  bloc: chatBloc,
+                                                  builder: (context, state) {
+                                                    if (state
+                                                        is RatingChangedState) {
+                                                      _rating = state.rating;
+                                                    }
+                                                    if (_rating < 4) {
+                                                      return TextField(
+                                                        textAlign:
+                                                            TextAlign.start,
+                                                        decoration:
+                                                            InputDecoration(
+                                                          labelText:
+                                                              "Enter Expected Response:",
+                                                          border:
+                                                              OutlineInputBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10),
+                                                          ),
+                                                        ),
+                                                        maxLines: 5,
+                                                        controller:
+                                                            expectedResponseEditingController,
+                                                      );
+                                                    }
+                                                    return SizedBox();
+                                                  },
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                                onPressed: () {
+                                                  chatBloc.add(FeedbackSubmitEvent(
+                                                      queryId: chatMessage.id,
+                                                      rating: (_rating).toInt(),
+                                                      feedback:
+                                                          feedbackEditingController
+                                                              .text,
+                                                      expectedResponse:
+                                                          expectedResponseEditingController
+                                                              .text));
+
+                                                  Navigator.of(context).pop();
+                                                },
+                                                child: const Text("Submit")),
+                                            TextButton(
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                },
+                                                child: const Text("Cancel")),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  },
+                                  icon: Icon(Icons.feedback_rounded))
+                            ]),
+                          ],
                         ),
                 ),
                 Flexible(

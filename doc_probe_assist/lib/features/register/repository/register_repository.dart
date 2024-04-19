@@ -11,7 +11,7 @@ class RegisterRepository {
       String name, String empID, String email, String password) async {
     final api = apiService.getApiWithoutHeader();
     FormData data = FormData.fromMap({
-      "name": name,
+      "first_name": name,
       "email": email,
       "username": empID,
       "password": password
@@ -19,7 +19,6 @@ class RegisterRepository {
     try {
       await api.post(registerURL, data: data);
     } on DioException catch (e) {
-      print(e.response);
       throw ApiException(exception: e, error: [
         "Unexpected error",
         (e.response?.data as Map<String, dynamic>)

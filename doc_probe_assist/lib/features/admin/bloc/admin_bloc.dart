@@ -1,8 +1,12 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:bloc/bloc.dart';
+import 'package:doc_probe_assist/core/exceptions/api_exceptions.dart';
 import 'package:doc_probe_assist/features/admin/repository/admin_repository.dart';
+import 'package:doc_probe_assist/features/chat/bloc/chat_bloc.dart';
 import 'package:doc_probe_assist/models/document_model.dart';
+import 'package:doc_probe_assist/models/feedback_model.dart';
 import 'package:doc_probe_assist/models/user_model.dart';
 import 'package:doc_probe_assist/service_locator.dart';
 import 'package:meta/meta.dart';
@@ -29,6 +33,11 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     on<AllDocumentFetchEvent>(onAllDocumentFetchEvent);
     on<DeleteDocumentEvent>(onDeleteDocumentEvent);
     on<ApproveDocumentEvent>(onApproveDocumentEvent);
+    on<UploadDocumentButtonClickedEvent>(onUploadDocumentButtonClickedEvent);
+    on<NewDocumentSelectedEvent>(onNewDocumentSelectedEvent);
+
+    //Feedback
+    on<AllFeedbackFetchEvent>(onAllFeedbackFetchEvent);
   }
 
   FutureOr<void> onUsersFetchEvent(
@@ -126,6 +135,35 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
       emit(DocumentApprovedState(document: document));
     } catch (e) {
       emit(DocumentApproveFailedState());
+    }
+  }
+
+  Future<FutureOr<void>> onUploadDocumentButtonClickedEvent(
+      UploadDocumentButtonClickedEvent event, Emitter<AdminState> emit) async {
+    try {
+      Document doc =
+          await adminRepository.uploadDocument(event.file!, event.name);
+      emit(UploadDocumentSuccessState(document: doc));
+    } on ApiException catch (e) {
+      print(e.error);
+      emit(UploadDocumentFailedState());
+    }
+  }
+
+  FutureOr<void> onNewDocumentSelectedEvent(
+      NewDocumentSelectedEvent event, Emitter<AdminState> emit) {
+    emit(NewDocumentSelectedState(fileName: event.name, file: event.file));
+  }
+
+  Future<FutureOr<void>> onAllFeedbackFetchEvent(
+      AllFeedbackFetchEvent event, Emitter<AdminState> emit) async {
+    emit(FeedbackLoadingState());
+    try {
+      List<FeedBackModel> feedbacks = await adminRepository.getFeedback();
+      emit(FeedbackLoadingSuccessState(feedbacks: feedbacks));
+    } on ApiException catch (e) {
+      print(e.error);
+      emit(FeedbackLoadingFailedState());
     }
   }
 }

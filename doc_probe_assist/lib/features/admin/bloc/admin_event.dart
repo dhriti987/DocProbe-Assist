@@ -52,3 +52,20 @@ class DeleteDocumentEvent extends AdminEvent {
 
   DeleteDocumentEvent({required this.document});
 }
+
+class UploadDocumentButtonClickedEvent extends AdminEvent {
+  final Uint8List? file;
+  final String name;
+
+  UploadDocumentButtonClickedEvent({required this.file, required this.name});
+}
+
+class NewDocumentSelectedEvent extends AdminEvent {
+  final Uint8List file;
+  final String name;
+
+  NewDocumentSelectedEvent({required this.file, required this.name});
+}
+
+// Feedback
+class AllFeedbackFetchEvent extends AdminEvent {}

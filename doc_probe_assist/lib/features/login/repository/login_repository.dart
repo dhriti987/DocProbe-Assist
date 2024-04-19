@@ -23,7 +23,6 @@ class LoginRepository {
       await sharedPreferences.setString("token", response.data['token']);
       appRouter.isAuthenticated = true;
     } on DioException catch (e) {
-      print(e.response?.data);
       throw ApiException(
           exception: e, error: ["Login Failed", e.response?.data['error']]);
     }

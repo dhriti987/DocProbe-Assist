@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:bloc/bloc.dart';
 import 'package:doc_probe_assist/core/exceptions/api_exceptions.dart';
@@ -7,8 +8,10 @@ import 'package:doc_probe_assist/features/login/repository/login_repository.dart
 import 'package:doc_probe_assist/models/chat_message_model.dart';
 import 'package:doc_probe_assist/models/chat_model.dart';
 import 'package:doc_probe_assist/models/document_model.dart';
+import 'package:doc_probe_assist/models/reference_model.dart';
 import 'package:doc_probe_assist/models/user_model.dart';
 import 'package:doc_probe_assist/service_locator.dart';
+import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
 part 'chat_event.dart';
@@ -24,7 +27,12 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<RenameChatOptionClickedEvent>(onRenameChatOptionClickedEvent);
     on<DeleteChatOptionClickedEvent>(onDeleteChatOptionClickedEvent);
     on<ResolveQueryEvent>(onResolveQueryEvent);
+    on<RegenerateResponseEvent>(onRegenerateResponseEvent);
     on<LogoutButtonClickedEvent>(onLogoutButtonClickedEvent);
+    on<RatingChangedEvent>(onRatingChangedEvent);
+    on<UploadDocumentButtonClickedEvent>(onUploadDocumentButtonClickedEvent);
+    on<NewDocumentSelectedEvent>(onNewDocumentSelectedEvent);
+    on<FeedbackSubmitEvent>(onFeedbackSubmitEvent);
   }
 
   FutureOr<void> onFetchDataEvent(
@@ -81,33 +89,87 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
   FutureOr<void> onResolveQueryEvent(
       ResolveQueryEvent event, Emitter<ChatState> emit) async {
-    emit(NewChatMessageState(
-        chatMessage: ChatMessage(
-            id: -1,
-            query: event.query,
-            response: "",
-            chatId: event.chatIndex,
-            time: "12/12/12",
-            loading: true)));
-    await Future.delayed(const Duration(seconds: 10), () {
-      emit(
-        NewChatMessageState(
+    try {
+      emit(NewChatMessageState(
           chatMessage: ChatMessage(
-              id: 3,
+              id: -1,
               query: event.query,
-              response:
-                  "Aye Mate DocProbe Assist will be available soon to help you. ",
+              response: '',
               chatId: event.chatIndex,
-              time: "12/12/12",
-              animate: true),
-        ),
-      );
-    });
+              time: '',
+              loading: true),
+          references: []));
+      var response = await chatRepository.createAnswer(
+          event.chatIndex, event.docId, event.query);
+      var chatMessage = response['chat'];
+      var references = response['references'];
+      chatMessage.animate = true;
+      // await Future.delayed(const Duration(seconds: ), () {
+      emit(NewChatMessageState(
+          chatMessage: chatMessage, references: references));
+      // });
+    } on ApiException catch (e) {
+      print('error');
+    }
+  }
+
+  Future<FutureOr<void>> onRegenerateResponseEvent(
+      RegenerateResponseEvent event, Emitter<ChatState> emit) async {
+    try {
+      emit(RegenerateAnswerState(
+          chatMessage: ChatMessage(
+              id: event.chatMessage.id,
+              query: event.chatMessage.query,
+              response: '',
+              chatId: event.chatMessage.chatId,
+              time: '',
+              loading: true)));
+      var response =
+          await chatRepository.regenerateAnswer(event.chatMessage.id);
+      var chatMessage = response['chat'];
+      chatMessage.animate = true;
+      // await Future.delayed(const Duration(seconds: ), () {
+      emit(RegenerateAnswerState(chatMessage: chatMessage));
+      // });
+    } on ApiException catch (e) {
+      print(e);
+    }
   }
 
   FutureOr<void> onLogoutButtonClickedEvent(
       LogoutButtonClickedEvent event, Emitter<ChatState> emit) async {
     await sl.get<LoginRepository>().logout();
     emit(LogoutState());
+  }
+
+  FutureOr<void> onRatingChangedEvent(
+      RatingChangedEvent event, Emitter<ChatState> emit) {
+    emit(RatingChangedState(rating: event.rating));
+  }
+
+  Future<FutureOr<void>> onUploadDocumentButtonClickedEvent(
+      UploadDocumentButtonClickedEvent event, Emitter<ChatState> emit) async {
+    try {
+      await chatRepository.uploadDocument(event.file!, event.name);
+      emit(UploadDocumentSuccessState());
+    } on ApiException catch (e) {
+      emit(UploadDocumentFailedState());
+    }
+  }
+
+  FutureOr<void> onNewDocumentSelectedEvent(
+      NewDocumentSelectedEvent event, Emitter<ChatState> emit) {
+    emit(NewDocumentSelectedState(fileName: event.name, file: event.file));
+  }
+
+  Future<FutureOr<void>> onFeedbackSubmitEvent(
+      FeedbackSubmitEvent event, Emitter<ChatState> emit) async {
+    try {
+      await chatRepository.submitFeedback(
+          event.queryId, event.rating, event.feedback, event.expectedResponse);
+      emit(FeedbackSuccessState());
+    } on ApiException catch (e) {
+      emit(FeedbackFailedState(message: e.error[1]));
+    }
   }
 }

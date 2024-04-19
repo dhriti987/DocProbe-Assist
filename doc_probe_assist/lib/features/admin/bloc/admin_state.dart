@@ -60,10 +60,29 @@ class DocumentApprovedState extends AdminState {
 
 class DocumentApproveFailedState extends AdminState {}
 
+class NewDocumentSelectedState extends AdminState {
+  final String fileName;
+  final Uint8List file;
+
+  NewDocumentSelectedState({required this.fileName, required this.file});
+}
+
+class UploadDocumentSuccessState extends AdminActionState {
+  final Document document;
+
+  UploadDocumentSuccessState({required this.document});
+}
+
+class UploadDocumentFailedState extends AdminState {}
+
 // Feedback
 
 class FeedbackLoadingState extends AdminState {}
 
-class FeedbackLoadingSuccessState extends AdminState {}
+class FeedbackLoadingSuccessState extends AdminState {
+  final List<FeedBackModel> feedbacks;
+
+  FeedbackLoadingSuccessState({required this.feedbacks});
+}
 
 class FeedbackLoadingFailedState extends AdminState {}

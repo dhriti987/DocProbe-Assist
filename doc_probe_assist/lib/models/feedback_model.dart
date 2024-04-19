@@ -20,7 +20,7 @@ class FeedBackModel {
     return FeedBackModel(
       question: json['question'],
       answer: json['answer'],
-      username: json['username'] ?? '',
+      username: json['username'] ?? 'Anonymous',
       isGood: json['isGood'] ?? false,
       feedback: json['feedback'] ?? '',
       date: json['date'] ?? '',

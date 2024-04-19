@@ -29,6 +29,8 @@ class ReferenceTab extends StatelessWidget {
           chats.add(state.chat);
         } else if (state is ChatDeleteState) {
           chats.removeAt(state.index);
+        } else if (state is NewChatMessageState) {
+          references = state.references;
         }
         return Container(
           decoration: const BoxDecoration(

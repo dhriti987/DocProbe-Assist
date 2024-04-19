@@ -42,8 +42,15 @@ class ChatRenameState extends ChatState {}
 
 class NewChatMessageState extends ChatState {
   final ChatMessage chatMessage;
+  final List<Reference> references;
 
-  NewChatMessageState({required this.chatMessage});
+  NewChatMessageState({required this.chatMessage, required this.references});
+}
+
+class RegenerateAnswerState extends ChatState {
+  final ChatMessage chatMessage;
+
+  RegenerateAnswerState({required this.chatMessage});
 }
 
 class LogoutState extends ChatActionState {}
@@ -53,4 +60,38 @@ class ChatErrorState extends ChatActionState {
   final String message;
 
   ChatErrorState({required this.title, required this.message});
+}
+
+class RatingChangedState extends ChatState {
+  final double rating;
+
+  RatingChangedState({required this.rating});
+}
+
+class ResponseSuccessState extends ChatState {}
+
+class ResponseFailedState extends ChatState {
+  final String title;
+  final String message;
+
+  ResponseFailedState({required this.title, required this.message});
+}
+
+class NewDocumentSelectedState extends ChatActionState {
+  final String fileName;
+  final Uint8List file;
+
+  NewDocumentSelectedState({required this.fileName, required this.file});
+}
+
+class UploadDocumentSuccessState extends ChatState {}
+
+class UploadDocumentFailedState extends ChatState {}
+
+class FeedbackSuccessState extends ChatState {}
+
+class FeedbackFailedState extends ChatState {
+  final String message;
+
+  FeedbackFailedState({required this.message});
 }

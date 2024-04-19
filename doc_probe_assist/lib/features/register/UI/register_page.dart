@@ -26,7 +26,23 @@ class RegisterPage extends StatelessWidget {
       listenWhen: (previous, current) => current is RegisterActionState,
       listener: (context, state) {
         if (state is RegisterLoadingSuccessState) {
-          context.go('/login');
+          showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text('Registration Successfull!'),
+                content: const Text(
+                    'Please contact the administrator to access your account.'),
+                actions: [
+                  ElevatedButton(
+                      onPressed: () {
+                        context.go('/login');
+                      },
+                      child: const Text('Ok'))
+                ],
+              );
+            },
+          );
         } else if (state is RegisterLoadingFailedState) {
           showDialog(
             context: context,
@@ -49,17 +65,6 @@ class RegisterPage extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         }
         return Scaffold(
-          appBar: AppBar(
-            title: Row(
-              children: [
-                Image.asset(
-                  'assets/doc_probe_logo.png',
-                  fit: BoxFit.contain,
-                  height: 56,
-                ),
-              ],
-            ),
-          ),
           body: Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
@@ -83,6 +88,10 @@ class RegisterPage extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        Text(
+                          'DocProbe Assist',
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
                         Row(
                           children: [
                             Expanded(
@@ -223,7 +232,10 @@ class RegisterPage extends StatelessWidget {
                                     // sl.get<RegisterRepository>().register(
                                     //     "abd", "cdd", "ab@mail.com", "mnbv9876");
                                   },
-                                  child: const Text('Register Request'),
+                                  child: const Text('Register Request',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontFamily: 'Adani')),
                                   style: ElevatedButton.styleFrom(
                                     padding: const EdgeInsets.symmetric(
                                       vertical: 16.0,

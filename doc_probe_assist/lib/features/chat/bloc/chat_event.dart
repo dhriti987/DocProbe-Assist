@@ -42,6 +42,20 @@ class SettingsButtonClickedEvent extends ChatEvent {}
 
 class AboutUsButtonClickedEvent extends ChatEvent {}
 
+class UploadDocumentButtonClickedEvent extends ChatEvent {
+  final Uint8List? file;
+  final String name;
+
+  UploadDocumentButtonClickedEvent({required this.file, required this.name});
+}
+
+class NewDocumentSelectedEvent extends ChatEvent {
+  final Uint8List file;
+  final String name;
+
+  NewDocumentSelectedEvent({required this.file, required this.name});
+}
+
 // Chat Window Event
 
 class ResolveQueryEvent extends ChatEvent {
@@ -52,13 +66,34 @@ class ResolveQueryEvent extends ChatEvent {
   ResolveQueryEvent({required this.chatIndex, required this.query, this.docId});
 }
 
-class RegenerateResponseEvent extends ChatEvent {}
+class RegenerateResponseEvent extends ChatEvent {
+  final ChatMessage chatMessage;
 
-class GoodResponseEvent extends ChatEvent {}
+  RegenerateResponseEvent({required this.chatMessage});
+}
 
 class BadResponseEvent extends ChatEvent {}
 
 class ResponseFeedBackEvent extends ChatEvent {}
+
+class FeedbackSubmitEvent extends ChatEvent {
+  final int queryId;
+  final int rating;
+  final String feedback;
+  final String expectedResponse;
+
+  FeedbackSubmitEvent(
+      {required this.queryId,
+      required this.rating,
+      required this.feedback,
+      required this.expectedResponse});
+}
+
+class RatingChangedEvent extends ChatEvent {
+  final double rating;
+
+  RatingChangedEvent({required this.rating});
+}
 
 // References Tab Events
 

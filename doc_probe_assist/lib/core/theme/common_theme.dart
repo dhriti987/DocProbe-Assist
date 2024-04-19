@@ -35,6 +35,15 @@ ThemeData lightTheme = ThemeData(
       fontWeight: FontWeight.w400,
       fontSize: 22,
     ),
+    titleLarge: TextStyle(
+      color: Colors.black,
+      shadows: [
+        Shadow(color: Colors.white, blurRadius: 5, offset: Offset(1, 1))
+      ],
+      fontStyle: FontStyle.normal,
+      fontWeight: FontWeight.w900,
+      fontSize: 70,
+    ),
     titleMedium: TextStyle(
       fontWeight: FontWeight.w900,
       fontSize: 20,

@@ -15,17 +15,6 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          children: [
-            Image.asset(
-              'assets/doc_probe_logo.png',
-              fit: BoxFit.contain,
-              height: 56,
-            ),
-          ],
-        ),
-      ),
       body: BlocListener<LoginBloc, LoginState>(
         bloc: bloc,
         listener: (context, state) {
@@ -64,6 +53,16 @@ class LoginPage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Image.asset(
+
+                      //   'assets/doc_probe_logo.png',
+                      //   fit: BoxFit.contain,
+                      //   height: 200,
+                      // ),
+                      Text(
+                        'DocProbe Assist',
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
                       Row(
                         children: [
                           Expanded(

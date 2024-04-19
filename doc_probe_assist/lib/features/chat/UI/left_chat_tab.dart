@@ -1,9 +1,15 @@
+import 'dart:typed_data';
+
 import 'package:doc_probe_assist/features/chat/bloc/chat_bloc.dart';
+import 'package:doc_probe_assist/features/chat/repository/chat_repository.dart';
 import 'package:doc_probe_assist/models/chat_model.dart';
 import 'package:doc_probe_assist/models/user_model.dart';
+import 'package:doc_probe_assist/service_locator.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'dart:io';
 
 class LeftChatTab extends StatelessWidget {
   LeftChatTab({
@@ -57,9 +63,9 @@ class LeftChatTab extends StatelessWidget {
           child: Column(
             children: [
               UserWidget(
-                user: user,
-                onLogout: () => chatBloc.add(LogoutButtonClickedEvent()),
-              ),
+                  user: user,
+                  onLogout: () => chatBloc.add(LogoutButtonClickedEvent()),
+                  chatBloc: chatBloc),
               InkWell(
                 onTap: () {
                   showDialog(
@@ -134,13 +140,22 @@ class LeftChatTab extends StatelessWidget {
 }
 
 class UserWidget extends StatelessWidget {
-  const UserWidget({super.key, required this.user, required this.onLogout});
+  const UserWidget(
+      {super.key,
+      required this.user,
+      required this.onLogout,
+      required this.chatBloc});
 
   final UserModel? user;
   final void Function() onLogout;
 
+  final ChatBloc chatBloc;
+
   @override
   Widget build(BuildContext context) {
+    TextEditingController documentNameTextEditingController =
+        TextEditingController();
+    FilePickerResult? result;
     return PopupMenuButton(
       offset: const Offset(20, 40),
       tooltip: user?.name,
@@ -183,12 +198,143 @@ class UserWidget extends StatelessWidget {
               style: Theme.of(context).textTheme.labelMedium,
             ),
           ),
-          // PopupMenuItem(
-          //   child: Text(
-          //     "Settings",
-          //     style: Theme.of(context).textTheme.labelMedium,
-          //   ),
-          // ),
+          PopupMenuItem(
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  var fileName = 'No File Choosen';
+                  Uint8List? file;
+                  return BlocConsumer<ChatBloc, ChatState>(
+                    bloc: chatBloc,
+                    listener: (context, state) {},
+                    builder: (context, state) {
+                      if (state is NewDocumentSelectedState) {
+                        fileName = state.fileName;
+                        file = state.file;
+                      }
+                      if (state is UploadDocumentSuccessState) {
+                        return AlertDialog(
+                          content: Text('Document Uploded Successfully.'),
+                          actions: [
+                            ElevatedButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text(
+                                  'Ok',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium
+                                      ?.copyWith(fontSize: 10),
+                                ))
+                          ],
+                        );
+                      }
+                      if (state is UploadDocumentFailedState) {
+                        return AlertDialog(
+                          content: Text(
+                              'Document Uploded Failed. Please try Again Later.'),
+                          actions: [
+                            ElevatedButton(
+                                onPressed: () {},
+                                child: Text(
+                                  'Ok',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium
+                                      ?.copyWith(fontSize: 10),
+                                ))
+                          ],
+                        );
+                      }
+                      return AlertDialog(
+                        title: const Text("Upload Document"),
+                        content: SizedBox(
+                          width: 300,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              TextField(
+                                controller: documentNameTextEditingController,
+                                decoration: const InputDecoration(
+                                  labelText: "Enter Document Name:",
+                                ),
+                              ),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              Row(
+                                children: [
+                                  SizedBox(
+                                      width: 150,
+                                      child: Text(fileName,
+                                          overflow: TextOverflow.ellipsis)),
+                                  SizedBox(
+                                    width: 20,
+                                  ),
+                                  ElevatedButton(
+                                      onPressed: () async {
+                                        result =
+                                            await FilePicker.platform.pickFiles(
+                                          type: FileType.custom,
+                                          allowedExtensions: ['pdf'],
+                                        );
+                                        if (result != null) {
+                                          var _paths = result!.files.first;
+
+                                          chatBloc.add(NewDocumentSelectedEvent(
+                                              file: _paths.bytes!,
+                                              name: _paths.name));
+                                          // sl.get<ChatRepository>().uploadDocument(
+                                          //     _paths.bytes!, _paths.name);
+                                        } else {
+                                          // User canceled the picker
+                                          print('result null');
+                                        }
+                                      },
+                                      child: Text(
+                                        'Choose File',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .displayMedium
+                                            ?.copyWith(fontSize: 10),
+                                      ))
+                                ],
+                              )
+                            ],
+                          ),
+                        ),
+                        actions: [
+                          TextButton(
+                              onPressed: () {
+                                if (file != null) {
+                                  chatBloc.add(UploadDocumentButtonClickedEvent(
+                                      file: file, name: fileName));
+                                } else {
+                                  print('file null');
+                                }
+
+                                // Navigator.of(context).pop();
+                              },
+                              child: const Text("Upload")),
+                          TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text("Cancel")),
+                        ],
+                      );
+                    },
+                  );
+                },
+              );
+            },
+            child: Text(
+              "Upload Document",
+              style: Theme.of(context).textTheme.labelMedium,
+            ),
+          ),
           PopupMenuItem(
             enabled: user?.isAdmin ?? false,
             onTap: () => context.push('/admin', extra: user),
