@@ -144,6 +144,7 @@ class ChatRepository {
   Future<Map<String, dynamic>> createAnswer(
       int chatId, int? docId, String question) async {
     Dio api = apiService.getApi();
+    api.options.connectTimeout = null;
     var data = {
       "id": chatId,
       "query": question,
@@ -166,7 +167,7 @@ class ChatRepository {
 
   Future<Map<String, dynamic>> regenerateAnswer(int queryId) async {
     Dio api = apiService.getApi();
-
+    api.options.connectTimeout = null;
     try {
       var response = await api.post(regenerateAnswerURL,
           data: FormData.fromMap({'query_id': queryId}));

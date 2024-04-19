@@ -109,7 +109,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
           chatMessage: chatMessage, references: references));
       // });
     } on ApiException catch (e) {
-      print('error');
+      print(e);
     }
   }
 
@@ -152,7 +152,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     try {
       await chatRepository.uploadDocument(event.file!, event.name);
       emit(UploadDocumentSuccessState());
-    } on ApiException catch (e) {
+    } on ApiException catch (_) {
       emit(UploadDocumentFailedState());
     }
   }

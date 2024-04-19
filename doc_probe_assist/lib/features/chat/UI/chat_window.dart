@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:doc_probe_assist/features/chat/bloc/chat_bloc.dart';
 import 'package:doc_probe_assist/models/chat_message_model.dart';
 import 'package:doc_probe_assist/models/chat_model.dart';
@@ -5,6 +7,7 @@ import 'package:doc_probe_assist/models/document_model.dart';
 // import 'package:doc_probe_assist/models/user_model.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:go_router/go_router.dart';
@@ -182,6 +185,31 @@ class ChatWidget extends StatelessWidget {
                     ),
                     TextField(
                       // textAlign: TextAlign.center,
+                      onSubmitted: (value) {
+                        print(value);
+                      },
+                      focusNode: FocusNode(
+                        onKeyEvent: (FocusNode node, KeyEvent evt) {
+                          final shiftWithEnter = evt is KeyDownEvent &&
+                              evt.physicalKey == PhysicalKeyboardKey.enter &&
+                              HardwareKeyboard.instance.isShiftPressed;
+                          print(HardwareKeyboard.instance.isShiftPressed);
+                          if (shiftWithEnter) {
+                            if (index != null &&
+                                sendChat &&
+                                textEditingController.text.isNotEmpty) {
+                              chatBloc.add(ResolveQueryEvent(
+                                  chatIndex: chats[index!].id,
+                                  query: textEditingController.text,
+                                  docId: selectedDocument));
+                              textEditingController.text = "";
+                              sendChat = false;
+                            }
+                            return KeyEventResult.handled;
+                          }
+                          return KeyEventResult.ignored;
+                        },
+                      ),
                       controller: textEditingController,
                       decoration: InputDecoration(
                         hintText: "Type your Query Here",
@@ -294,12 +322,13 @@ class ChatWidget extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             TypeWriterText(
-                              alignment: Alignment.bottomLeft,
+                              maintainSize: false,
+                              alignment: Alignment.topLeft,
                               text: Text(
                                 chatMessage.response,
                                 style: Theme.of(context).textTheme.bodyMedium,
                               ),
-                              duration: const Duration(milliseconds: 1),
+                              duration: Duration(microseconds: 1),
                               play: toAnimate(chatMessage),
                             ),
                             Row(children: [
