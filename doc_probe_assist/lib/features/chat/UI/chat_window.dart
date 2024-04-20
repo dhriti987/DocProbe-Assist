@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:doc_probe_assist/features/chat/bloc/chat_bloc.dart';
 import 'package:doc_probe_assist/models/chat_message_model.dart';
 import 'package:doc_probe_assist/models/chat_model.dart';
@@ -117,8 +115,9 @@ class ChatWidget extends StatelessWidget {
                       (element) => element.id == state.chatMessage.id)] =
               state.chatMessage;
         }
-        Future.delayed(const Duration(milliseconds: 100), () {
-          scrollController.animateTo(scrollController.position.maxScrollExtent,
+        Future.delayed(const Duration(milliseconds: 50), () {
+          scrollController.animateTo(
+              scrollController.position.maxScrollExtent * 2,
               duration: const Duration(milliseconds: 500),
               curve: Curves.fastOutSlowIn);
         });
