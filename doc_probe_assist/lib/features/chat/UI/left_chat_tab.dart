@@ -1,15 +1,12 @@
 import 'dart:typed_data';
 
 import 'package:doc_probe_assist/features/chat/bloc/chat_bloc.dart';
-import 'package:doc_probe_assist/features/chat/repository/chat_repository.dart';
 import 'package:doc_probe_assist/models/chat_model.dart';
 import 'package:doc_probe_assist/models/user_model.dart';
-import 'package:doc_probe_assist/service_locator.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'dart:io';
 
 class LeftChatTab extends StatelessWidget {
   LeftChatTab({

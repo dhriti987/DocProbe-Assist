@@ -3,6 +3,7 @@ import 'package:doc_probe_assist/models/chat_model.dart';
 import 'package:doc_probe_assist/models/reference_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class ReferenceTab extends StatelessWidget {
@@ -64,10 +65,10 @@ class ReferenceTab extends StatelessWidget {
                       references[index].docName,
                     ),
                     subtitle: Text(
-                      "Page No: ${references[index].pageNumber}",
+                      "Page No: ${references[index].pageNumber + 1}",
                     ),
                     onTap: () => launchUrlString(
-                        '${references[index].url}#page=${references[index].pageNumber}'),
+                        '${dotenv.env['SERVER_URL'] ?? 'http://127.0.0.1:8000'}/${references[index].url}#page=${references[index].pageNumber + 1}'),
                   );
                 },
                 itemCount: references.length,
