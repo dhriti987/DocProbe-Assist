@@ -98,11 +98,11 @@ class ChatWidget extends StatelessWidget {
           int chatIndex = chats
               .indexWhere((element) => element.id == state.chatMessage.chatId);
 
-          sendChat = true;
           if (state.chatMessage.id != -1) {
             chats[chatIndex].chatMessages[chats[chatIndex]
                 .chatMessages
                 .indexWhere((element) => element.id == -1)] = state.chatMessage;
+            sendChat = true;
           } else {
             chats[chatIndex].chatMessages.add(state.chatMessage);
           }
@@ -183,6 +183,7 @@ class ChatWidget extends StatelessWidget {
                       height: 10,
                     ),
                     TextField(
+                      readOnly: !sendChat,
                       // textAlign: TextAlign.center,
                       onSubmitted: (value) {
                         print(value);

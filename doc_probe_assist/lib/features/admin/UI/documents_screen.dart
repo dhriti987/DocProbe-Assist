@@ -38,31 +38,7 @@ class _DocumentScreenState extends State<DocumentScreen>
       bloc: adminBloc,
       buildWhen: (previous, current) => current is! AdminActionState,
       listenWhen: (previous, current) => current is AdminActionState,
-      listener: (context, state) {
-        if (state is UploadDocumentSuccessState) {
-          allDocs.add(state.document);
-          showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  content: Text('Document Uploded Successfully.'),
-                  actions: [
-                    ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: Text(
-                          'Ok',
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium
-                              ?.copyWith(fontSize: 10),
-                        ))
-                  ],
-                );
-              });
-        }
-      },
+      listener: (context, state) {},
       builder: (context, state) {
         if (state is AdminInitial) {
           adminBloc.add(AllDocumentFetchEvent());
@@ -123,6 +99,8 @@ class _DocumentScreenState extends State<DocumentScreen>
               );
             },
           );
+        } else if (state is UploadDocumentSuccessState) {
+          allDocs.add(state.document);
         }
         return Column(
           children: [

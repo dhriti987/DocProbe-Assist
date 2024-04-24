@@ -24,14 +24,26 @@ class ReferenceTab extends StatelessWidget {
       builder: (context, state) {
         if (state is ChatPageLoadingSuccessState) {
           chats = List.from(state.chats);
+          // print(chats[0].chatMessages[0].references);
         } else if (state is ChangeChatState) {
-          references = chats[state.index].reference;
+          references = chats[state.index].chatMessages.isNotEmpty
+              ? chats[state.index].chatMessages.last.references
+              : [];
         } else if (state is NewChatCreatedState) {
           chats.add(state.chat);
         } else if (state is ChatDeleteState) {
           chats.removeAt(state.index);
         } else if (state is NewChatMessageState) {
-          references = state.references;
+          int chatIndex = chats
+              .indexWhere((element) => element.id == state.chatMessage.chatId);
+
+          if (state.chatMessage.id != -1) {
+            chats[chatIndex].chatMessages[chats[chatIndex]
+                .chatMessages
+                .indexWhere((element) => element.id == -1)] = state.chatMessage;
+          } else {
+            chats[chatIndex].chatMessages.add(state.chatMessage);
+          }
         }
         return Container(
           decoration: const BoxDecoration(

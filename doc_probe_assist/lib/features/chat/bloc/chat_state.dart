@@ -84,9 +84,9 @@ class NewDocumentSelectedState extends ChatActionState {
   NewDocumentSelectedState({required this.fileName, required this.file});
 }
 
-class UploadDocumentSuccessState extends ChatState {}
+class UploadDocumentSuccessState extends ChatActionState {}
 
-class UploadDocumentFailedState extends ChatState {}
+class UploadDocumentFailedState extends ChatActionState {}
 
 class FeedbackSuccessState extends ChatState {}
 

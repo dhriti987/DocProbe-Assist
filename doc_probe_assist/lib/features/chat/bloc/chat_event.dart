@@ -45,8 +45,10 @@ class AboutUsButtonClickedEvent extends ChatEvent {}
 class UploadDocumentButtonClickedEvent extends ChatEvent {
   final Uint8List? file;
   final String name;
+  final String fileName;
 
-  UploadDocumentButtonClickedEvent({required this.file, required this.name});
+  UploadDocumentButtonClickedEvent(
+      {required this.file, required this.name, required this.fileName});
 }
 
 class NewDocumentSelectedEvent extends ChatEvent {

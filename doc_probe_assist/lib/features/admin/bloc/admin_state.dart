@@ -67,7 +67,7 @@ class NewDocumentSelectedState extends AdminState {
   NewDocumentSelectedState({required this.fileName, required this.file});
 }
 
-class UploadDocumentSuccessState extends AdminActionState {
+class UploadDocumentSuccessState extends AdminState {
   final Document document;
 
   UploadDocumentSuccessState({required this.document});

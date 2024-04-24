@@ -4,7 +4,6 @@ import 'dart:typed_data';
 import 'package:bloc/bloc.dart';
 import 'package:doc_probe_assist/core/exceptions/api_exceptions.dart';
 import 'package:doc_probe_assist/features/admin/repository/admin_repository.dart';
-import 'package:doc_probe_assist/features/chat/bloc/chat_bloc.dart';
 import 'package:doc_probe_assist/models/document_model.dart';
 import 'package:doc_probe_assist/models/feedback_model.dart';
 import 'package:doc_probe_assist/models/user_model.dart';

@@ -101,12 +101,13 @@ class ChatRepository {
     }
   }
 
-  Future<void> uploadDocument(Uint8List file, String fileName) async {
+  Future<void> uploadDocument(
+      Uint8List file, String name, String fileName) async {
     Dio api = apiService.getApi();
     try {
       FormData formData = FormData.fromMap({
         "file": MultipartFile.fromBytes(file, filename: fileName),
-        "name": fileName
+        "name": name
       });
 
       await api.post(uploadDocumentURL, data: formData);

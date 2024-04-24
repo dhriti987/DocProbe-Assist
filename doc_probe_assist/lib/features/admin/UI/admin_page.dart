@@ -58,14 +58,16 @@ class _AdminPageState extends State<AdminPage> {
                     backgroundColor: Colors.blue,
                     child: Center(
                       child: Text(
-                        widget.user.name[0],
+                        widget.user.name.isEmpty ? "A" : widget.user.name[0],
                         style: const TextStyle(fontSize: 50),
                       ),
                     ),
                   ),
                   const Spacer(),
                   Text(
-                    widget.user.name,
+                    widget.user.name.isEmpty
+                        ? "Anonymous User"
+                        : widget.user.name,
                     style: const TextStyle(fontWeight: FontWeight.w900),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,

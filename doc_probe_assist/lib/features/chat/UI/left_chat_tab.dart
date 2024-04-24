@@ -34,6 +34,46 @@ class LeftChatTab extends StatelessWidget {
               content: Text(state.message),
             ),
           );
+        } else if (state is UploadDocumentSuccessState) {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              content: Text('Document Uploded Successfully.'),
+              actions: [
+                ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text(
+                      'Ok',
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium
+                          ?.copyWith(fontSize: 10),
+                    ))
+              ],
+            ),
+          );
+        } else if (state is UploadDocumentFailedState) {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              content: Text('Document Uploded Failed. Please try Again Later.'),
+              actions: [
+                ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text(
+                      'Ok',
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium
+                          ?.copyWith(fontSize: 10),
+                    ))
+              ],
+            ),
+          );
         }
       },
       builder: (context, state) {
@@ -167,7 +207,7 @@ class UserWidget extends StatelessWidget {
               backgroundColor: Colors.lightBlue,
               child: Center(
                   child: Text(
-                user?.name[0] ?? "Unknown User",
+                user!.name.isEmpty ? "A" : user!.name[0],
                 style: const TextStyle(fontWeight: FontWeight.w900),
                 overflow: TextOverflow.fade,
               )),
@@ -177,7 +217,7 @@ class UserWidget extends StatelessWidget {
             ),
             Expanded(
               child: Text(
-                user?.name ?? "Unknown User",
+                user!.name.isEmpty ? "Anonymous User" : user!.name,
                 maxLines: 1,
                 style: Theme.of(context).textTheme.titleMedium,
                 overflow: TextOverflow.ellipsis,
@@ -202,132 +242,230 @@ class UserWidget extends StatelessWidget {
                 builder: (context) {
                   var fileName = 'No File Choosen';
                   Uint8List? file;
-                  return BlocConsumer<ChatBloc, ChatState>(
-                    bloc: chatBloc,
-                    listener: (context, state) {},
-                    builder: (context, state) {
-                      if (state is NewDocumentSelectedState) {
-                        fileName = state.fileName;
-                        file = state.file;
-                      }
-                      if (state is UploadDocumentSuccessState) {
-                        return AlertDialog(
-                          content: Text('Document Uploded Successfully.'),
-                          actions: [
-                            ElevatedButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: Text(
-                                  'Ok',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleMedium
-                                      ?.copyWith(fontSize: 10),
-                                ))
-                          ],
-                        );
-                      }
-                      if (state is UploadDocumentFailedState) {
-                        return AlertDialog(
-                          content: Text(
-                              'Document Uploded Failed. Please try Again Later.'),
-                          actions: [
-                            ElevatedButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                child: Text(
-                                  'Ok',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleMedium
-                                      ?.copyWith(fontSize: 10),
-                                ))
-                          ],
-                        );
-                      }
-                      return AlertDialog(
-                        title: const Text("Upload Document"),
-                        content: SizedBox(
-                          width: 300,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              TextField(
-                                controller: documentNameTextEditingController,
-                                decoration: const InputDecoration(
-                                  labelText: "Enter Document Name:",
-                                ),
-                              ),
-                              SizedBox(
-                                height: 20,
-                              ),
-                              Row(
-                                children: [
-                                  SizedBox(
-                                      width: 150,
-                                      child: Text(fileName,
-                                          overflow: TextOverflow.ellipsis)),
-                                  SizedBox(
-                                    width: 20,
-                                  ),
-                                  ElevatedButton(
-                                      onPressed: () async {
-                                        result =
-                                            await FilePicker.platform.pickFiles(
-                                          type: FileType.custom,
-                                          allowedExtensions: ['pdf'],
-                                        );
-                                        if (result != null) {
-                                          var _paths = result!.files.first;
-
-                                          chatBloc.add(NewDocumentSelectedEvent(
-                                              file: _paths.bytes!,
-                                              name: _paths.name));
-                                          // sl.get<ChatRepository>().uploadDocument(
-                                          //     _paths.bytes!, _paths.name);
-                                        } else {
-                                          // User canceled the picker
-                                          print('result null');
-                                        }
-                                      },
-                                      child: Text(
-                                        'Choose File',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .displayMedium
-                                            ?.copyWith(fontSize: 10),
-                                      ))
-                                ],
-                              )
-                            ],
+                  return AlertDialog(
+                    title: const Text("Upload Document"),
+                    content: SizedBox(
+                      width: 300,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          TextField(
+                            controller: documentNameTextEditingController,
+                            decoration: const InputDecoration(
+                              labelText: "Enter Document Name:",
+                            ),
                           ),
-                        ),
-                        actions: [
-                          TextButton(
-                              onPressed: () {
-                                if (file != null) {
-                                  chatBloc.add(UploadDocumentButtonClickedEvent(
-                                      file: file, name: fileName));
-                                } else {
-                                  print('file null');
-                                }
-
-                                // Navigator.of(context).pop();
-                              },
-                              child: const Text("Upload")),
-                          TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text("Cancel")),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          Row(
+                            children: [
+                              SizedBox(
+                                  width: 150,
+                                  child: BlocBuilder<ChatBloc, ChatState>(
+                                    bloc: chatBloc,
+                                    buildWhen: (previous, current) =>
+                                        current is NewDocumentSelectedState,
+                                    builder: (context, state) {
+                                      return Text(fileName,
+                                          overflow: TextOverflow.ellipsis);
+                                    },
+                                  )),
+                              SizedBox(
+                                width: 20,
+                              ),
+                              ElevatedButton(
+                                  onPressed: () async {
+                                    result =
+                                        await FilePicker.platform.pickFiles(
+                                      type: FileType.custom,
+                                      allowedExtensions: ['pdf'],
+                                    );
+                                    if (result != null) {
+                                      var fileObject = result!.files.first;
+                                      fileName = fileObject.name;
+                                      file = fileObject.bytes;
+                                      chatBloc.add(NewDocumentSelectedEvent(
+                                          file: file!, name: fileName));
+                                      // // sl.get<ChatRepository>().uploadDocument(
+                                      // //     _paths.bytes!, _paths.name);
+                                    } else {
+                                      // User canceled the picker
+                                      print('result null');
+                                    }
+                                  },
+                                  child: Text(
+                                    'Choose File',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .displayMedium
+                                        ?.copyWith(fontSize: 10),
+                                  ))
+                            ],
+                          )
                         ],
-                      );
-                    },
+                      ),
+                    ),
+                    actions: [
+                      TextButton(
+                          onPressed: () {
+                            if (file != null) {
+                              chatBloc.add(UploadDocumentButtonClickedEvent(
+                                  file: file,
+                                  fileName: fileName,
+                                  name:
+                                      documentNameTextEditingController.text));
+                              file = null;
+                              documentNameTextEditingController.text = "";
+                              fileName = "No Document Selected";
+                              context.pop();
+                            } else {
+                              print('file null');
+                            }
+
+                            // Navigator.of(context).pop();
+                          },
+                          child: const Text("Upload")),
+                      TextButton(
+                          onPressed: () {
+                            context.pop();
+                          },
+                          child: const Text("Cancel")),
+                    ],
                   );
                 },
               );
+              // showDialog(
+              //   context: context,
+              //   builder: (context) {
+              //     var fileName = 'No File Choosen';
+              //     Uint8List? file;
+              //     return BlocConsumer<ChatBloc, ChatState>(
+              //       bloc: chatBloc,
+              //       listener: (context, state) {},
+              //       builder: (context, state) {
+              //         if (state is NewDocumentSelectedState) {
+              //           fileName = state.fileName;
+              //           file = state.file;
+              //         }
+              //         if (state is UploadDocumentSuccessState) {
+              //           return AlertDialog(
+              //             content: Text('Document Uploded Successfully.'),
+              //             actions: [
+              //               ElevatedButton(
+              //                   onPressed: () {
+              //                     Navigator.of(context).pop();
+              //                   },
+              //                   child: Text(
+              //                     'Ok',
+              //                     style: Theme.of(context)
+              //                         .textTheme
+              //                         .titleMedium
+              //                         ?.copyWith(fontSize: 10),
+              //                   ))
+              //             ],
+              //           );
+              //         }
+              //         if (state is UploadDocumentFailedState) {
+              //           return AlertDialog(
+              //             content: Text(
+              //                 'Document Uploded Failed. Please try Again Later.'),
+              //             actions: [
+              //               ElevatedButton(
+              //                   onPressed: () {
+              //                     Navigator.pop(context);
+              //                   },
+              //                   child: Text(
+              //                     'Ok',
+              //                     style: Theme.of(context)
+              //                         .textTheme
+              //                         .titleMedium
+              //                         ?.copyWith(fontSize: 10),
+              //                   ))
+              //             ],
+              //           );
+              //         }
+              //         return AlertDialog(
+              //           title: const Text("Upload Document"),
+              //           content: SizedBox(
+              //             width: 300,
+              //             child: Column(
+              //               mainAxisSize: MainAxisSize.min,
+              //               children: [
+              //                 TextField(
+              //                   controller: documentNameTextEditingController,
+              //                   decoration: const InputDecoration(
+              //                     labelText: "Enter Document Name:",
+              //                   ),
+              //                 ),
+              //                 SizedBox(
+              //                   height: 20,
+              //                 ),
+              //                 Row(
+              //                   children: [
+              //                     SizedBox(
+              //                         width: 150,
+              //                         child: Text(fileName,
+              //                             overflow: TextOverflow.ellipsis)),
+              //                     SizedBox(
+              //                       width: 20,
+              //                     ),
+              //                     ElevatedButton(
+              //                         onPressed: () async {
+              //                           result =
+              //                               await FilePicker.platform.pickFiles(
+              //                             type: FileType.custom,
+              //                             allowedExtensions: ['pdf'],
+              //                           );
+              //                           if (result != null) {
+              //                             var _paths = result!.files.first;
+
+              //                             chatBloc.add(NewDocumentSelectedEvent(
+              //                                 file: _paths.bytes!,
+              //                                 name: _paths.name));
+              //                             // sl.get<ChatRepository>().uploadDocument(
+              //                             //     _paths.bytes!, _paths.name);
+              //                           } else {
+              //                             // User canceled the picker
+              //                             print('result null');
+              //                           }
+              //                         },
+              //                         child: Text(
+              //                           'Choose File',
+              //                           style: Theme.of(context)
+              //                               .textTheme
+              //                               .displayMedium
+              //                               ?.copyWith(fontSize: 10),
+              //                         ))
+              //                   ],
+              //                 )
+              //               ],
+              //             ),
+              //           ),
+              //           actions: [
+              //             TextButton(
+              //                 onPressed: () {
+              //                   if (file != null) {
+              //                     chatBloc.add(UploadDocumentButtonClickedEvent(
+              //                         file: file, name: fileName));
+              //                   } else {
+              //                     print('file null');
+              //                   }
+
+              //                   // Navigator.of(context).pop();
+              //                 },
+              //                 child: const Text("Upload")),
+              //             TextButton(
+              //                 onPressed: () {
+              //                   Navigator.of(context).pop();
+              //                 },
+              //                 child: const Text("Cancel")),
+              //           ],
+              //         );
+              //       },
+              //     );
+              //   },
+              // );
             },
             child: Text(
               "Upload Document",

@@ -97,7 +97,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
               response: '',
               chatId: event.chatIndex,
               time: '',
-              loading: true),
+              loading: true,
+              references: []),
           references: []));
       var response = await chatRepository.createAnswer(
           event.chatIndex, event.docId, event.query);
@@ -123,7 +124,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
               response: '',
               chatId: event.chatMessage.chatId,
               time: '',
-              loading: true)));
+              loading: true,
+              references: event.chatMessage.references)));
       var response =
           await chatRepository.regenerateAnswer(event.chatMessage.id);
       var chatMessage = response['chat'];
@@ -150,7 +152,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   Future<FutureOr<void>> onUploadDocumentButtonClickedEvent(
       UploadDocumentButtonClickedEvent event, Emitter<ChatState> emit) async {
     try {
-      await chatRepository.uploadDocument(event.file!, event.name);
+      await chatRepository.uploadDocument(
+          event.file!, event.name, event.fileName);
       emit(UploadDocumentSuccessState());
     } on ApiException catch (_) {
       emit(UploadDocumentFailedState());
