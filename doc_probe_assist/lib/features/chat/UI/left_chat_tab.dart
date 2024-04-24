@@ -234,7 +234,9 @@ class UserWidget extends StatelessWidget {
                               'Document Uploded Failed. Please try Again Later.'),
                           actions: [
                             ElevatedButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
                                 child: Text(
                                   'Ok',
                                   style: Theme.of(context)

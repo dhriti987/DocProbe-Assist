@@ -56,24 +56,25 @@ class ReferenceTab extends StatelessWidget {
               const Divider(
                 thickness: 2,
               ),
-              ListView.builder(
-                padding: EdgeInsets.zero,
-                shrinkWrap: true,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(
-                      references[index].docName,
-                    ),
-                    subtitle: Text(
-                      "Page No: ${references[index].pageNumber + 1}",
-                    ),
-                    onTap: () => launchUrlString(
-                        '${dotenv.env['SERVER_URL'] ?? 'http://127.0.0.1:8000'}/${references[index].url}#page=${references[index].pageNumber + 1}'),
-                  );
-                },
-                itemCount: references.length,
+              Expanded(
+                child: ListView.builder(
+                  padding: EdgeInsets.zero,
+                  shrinkWrap: true,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: Text(
+                        references[index].docName,
+                      ),
+                      subtitle: Text(
+                        "Page No: ${references[index].pageNumber + 1}",
+                      ),
+                      onTap: () => launchUrlString(
+                          '${dotenv.env['SERVER_URL'] ?? 'http://127.0.0.1:8000'}${references[index].url}#page=${references[index].pageNumber + 1}'),
+                    );
+                  },
+                  itemCount: references.length,
+                ),
               ),
-              const Spacer(),
               Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 50, vertical: 10),
