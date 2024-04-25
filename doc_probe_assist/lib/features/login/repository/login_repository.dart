@@ -8,7 +8,7 @@ class LoginRepository {
   final SharedPreferences sharedPreferences;
   final ApiService apiService;
   final AppRouter appRouter;
-  final loginURL = "/auth/login/";
+  final loginURL = "/api/auth/login/";
 
   LoginRepository(
       {required this.sharedPreferences,

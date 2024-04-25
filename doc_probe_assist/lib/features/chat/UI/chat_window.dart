@@ -106,6 +106,7 @@ class ChatWidget extends StatelessWidget {
           } else {
             chats[chatIndex].chatMessages.add(state.chatMessage);
           }
+          print(chats[chatIndex].chatMessages.length);
         } else if (state is RegenerateAnswerState) {
           int chatIndex = chats
               .indexWhere((element) => element.id == state.chatMessage.chatId);
@@ -198,11 +199,11 @@ class ChatWidget extends StatelessWidget {
                             if (index != null &&
                                 sendChat &&
                                 textEditingController.text.isNotEmpty) {
-                              chatBloc.add(ResolveQueryEvent(
-                                  chatIndex: chats[index!].id,
-                                  query: textEditingController.text,
-                                  docId: selectedDocument));
-                              textEditingController.text = "";
+                              // chatBloc.add(ResolveQueryEvent(
+                              //     chatIndex: chats[index!].id,
+                              //     query: textEditingController.text,
+                              //     docId: selectedDocument));
+                              // textEditingController.text = "";
                               sendChat = false;
                             }
                             return KeyEventResult.handled;
@@ -218,6 +219,7 @@ class ChatWidget extends StatelessWidget {
                         ),
                         suffixIcon: IconButton(
                           onPressed: () {
+                            print(index);
                             if (index != null &&
                                 sendChat &&
                                 textEditingController.text.isNotEmpty) {

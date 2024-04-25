@@ -20,6 +20,10 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     on<AdminEvent>((event, emit) {
       // TODO: implement event handler
     });
+
+    //  Analytics
+    on<LoadAnalyticsEvent>(onLoadAnalyticsEvent);
+
     // User
     on<UsersFetchEvent>(onUsersFetchEvent);
     on<GiveAdminAcessUserEvent>(onGiveAdminAcessUserEvent);
@@ -37,6 +41,27 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
 
     //Feedback
     on<AllFeedbackFetchEvent>(onAllFeedbackFetchEvent);
+  }
+
+  Future<FutureOr<void>> onLoadAnalyticsEvent(
+      LoadAnalyticsEvent event, Emitter<AdminState> emit) async {
+    emit(AnalyticsDataLoadingState());
+    try {
+      var data = await adminRepository.getAnalyticsData();
+      var weeklyFeedback = data['weekly_feedback'];
+      var totalDocuments = data['total_documents'];
+      var embeddedDocuments = data['embedded_documents'];
+      var totalUsers = data['total_users'];
+      var totalQuestions = data['total_questions'];
+      emit(AnalyticsDataLoadingSuccessState(
+          weeklyFeedback: weeklyFeedback,
+          totalDocuments: totalDocuments,
+          embeddedDocuments: embeddedDocuments,
+          totalUsers: totalUsers,
+          totalQuestions: totalQuestions));
+    } catch (e) {
+      emit(AnalyticsDataLoadingFailedState());
+    }
   }
 
   FutureOr<void> onUsersFetchEvent(

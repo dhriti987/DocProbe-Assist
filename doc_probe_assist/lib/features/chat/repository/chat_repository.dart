@@ -11,14 +11,14 @@ import 'package:doc_probe_assist/models/user_model.dart';
 
 class ChatRepository {
   final ApiService apiService;
-  final getDocumentUrl = "/chatbot/doc/?embedded=true";
-  final getUserUrl = "/auth/user-info/";
-  final chatsURL = '/chatbot/chats/';
-  final chatsUpdateDeleteURL = '/chatbot/edit_chats/';
-  final uploadDocumentURL = '/chatbot/doc/';
-  final feedbackURL = '/chatbot/feedback/';
-  final createAnswerURL = '/chatbot/answer/';
-  final regenerateAnswerURL = '/chatbot/regenerate_answer/';
+  final getDocumentUrl = "/api/chatbot/doc/?embedded=true";
+  final getUserUrl = "/api/auth/user-info/";
+  final chatsURL = '/api/chatbot/chats/';
+  final chatsUpdateDeleteURL = '/api/chatbot/edit_chats/';
+  final uploadDocumentURL = '/api/chatbot/doc/';
+  final feedbackURL = '/api/chatbot/feedback/';
+  final createAnswerURL = '/api/chatbot/answer/';
+  final regenerateAnswerURL = '/api/chatbot/regenerate_answer/';
 
   ChatRepository({required this.apiService});
 

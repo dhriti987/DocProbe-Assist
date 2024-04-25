@@ -1,37 +1,39 @@
+import 'dart:math';
+
+import 'package:doc_probe_assist/features/admin/bloc/admin_bloc.dart';
+import 'package:doc_probe_assist/service_locator.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
-class AnalyticsScreen extends StatelessWidget {
+class AnalyticsScreen extends StatefulWidget {
   const AnalyticsScreen({super.key});
+
+  @override
+  State<AnalyticsScreen> createState() => _AnalyticsScreenState();
+}
+
+class _AnalyticsScreenState extends State<AnalyticsScreen> {
+  final AdminBloc adminBloc = sl.get<AdminBloc>();
+  List<String> bottomTilesDates = ['1', '2', '3', '4', '5', '6', '7'];
+  List<dynamic> weeklyFeedbackNum = [
+    [0, 0, 0],
+    [0, 0, 0],
+    [0, 0, 0],
+    [0, 0, 0],
+    [0, 0, 0],
+    [0, 0, 0],
+    [0, 0, 0]
+  ];
+  int totalDocuments = 0;
+  int embeddedDocuments = 0;
+  int totalUsers = 0;
+  int totalQuestions = 0;
 
   Widget bottomTitles(double value, TitleMeta meta) {
     const style = TextStyle(fontSize: 15);
-    String text;
-    switch (value.toInt()) {
-      case 0:
-        text = 'Mon';
-        break;
-      case 1:
-        text = 'Tue';
-        break;
-      case 2:
-        text = 'Wed';
-        break;
-      case 3:
-        text = 'Thurs';
-        break;
-      case 4:
-        text = 'Fri';
-        break;
-      case 5:
-        text = 'Sat';
-        break;
-      case 6:
-        text = 'Sun';
-        break;
-      default:
-        text = '';
-    }
+    String text = bottomTilesDates[value.toInt()];
     return SideTitleWidget(
       axisSide: meta.axisSide,
       child: Text(text, style: style),
@@ -40,287 +42,357 @@ class AnalyticsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 40),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Weekly Report',
-                    style: TextStyle(
-                      fontSize: 29,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 25),
-                  Row(
+    return BlocConsumer<AdminBloc, AdminState>(
+      bloc: adminBloc,
+      listener: (context, state) {
+        // TODO: implement listener
+      },
+      builder: (context, state) {
+        if (state is AdminInitial) {
+          adminBloc.add(LoadAnalyticsEvent());
+        }
+        if (state is AnalyticsDataLoadingState) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (state is AnalyticsDataLoadingSuccessState) {
+          bottomTilesDates = state.weeklyFeedback.keys.toList();
+          weeklyFeedbackNum = state.weeklyFeedback.values.toList();
+          totalDocuments = state.totalDocuments;
+          embeddedDocuments = state.embeddedDocuments;
+          totalUsers = state.totalUsers;
+          totalQuestions = state.totalQuestions;
+        } else if (state is AnalyticsDataLoadingFailedState) {
+          return AlertDialog(
+            content:
+                const Text('Not able to load data. Please try again later.'),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    context.pop();
+                  },
+                  child: const Text('Ok'))
+            ],
+          );
+        }
+
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 24, horizontal: 40),
+                  child: Column(
                     mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        width: 15,
-                        height: 15,
-                        decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: good_resp_color,
-                            border: Border.all()),
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        "Good Response",
-                        style: const TextStyle(
-                          fontSize: 18,
+                      const Text(
+                        'Weekly Report',
+                        style: TextStyle(
+                          fontSize: 29,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
+                      const SizedBox(height: 25),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 15,
+                            height: 15,
+                            decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: good_resp_color,
+                                border: Border.all()),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            "Good Response",
+                            style: const TextStyle(
+                              fontSize: 18,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 15,
+                          ),
+                          Container(
+                            width: 15,
+                            height: 15,
+                            decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: bad_resp_color,
+                                border: Border.all()),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            "Bad Response",
+                            style: const TextStyle(
+                              fontSize: 18,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 15,
+                          ),
+                          Container(
+                            width: 15,
+                            height: 15,
+                            decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: no_resp_color,
+                                border: Border.all()),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            "No Response",
+                            style: const TextStyle(
+                              fontSize: 18,
+                            ),
+                          ),
+                        ],
+                      ),
                       SizedBox(
-                        width: 15,
+                        height: 25,
                       ),
                       Container(
-                        width: 15,
-                        height: 15,
-                        decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: bad_resp_color,
-                            border: Border.all()),
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        "Bad Response",
-                        style: const TextStyle(
-                          fontSize: 18,
-                        ),
-                      ),
-                      SizedBox(
-                        width: 15,
-                      ),
-                      Container(
-                        width: 15,
-                        height: 15,
-                        decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: no_resp_color,
-                            border: Border.all()),
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        "No Response",
-                        style: const TextStyle(
-                          fontSize: 18,
+                        width: 900,
+                        height: 500,
+                        child: AspectRatio(
+                          aspectRatio: 2,
+                          child: BarChart(
+                            BarChartData(
+                              alignment: BarChartAlignment.spaceEvenly,
+                              titlesData: FlTitlesData(
+                                leftTitles: AxisTitles(
+                                    sideTitles: SideTitles(
+                                        interval: max(2.0,
+                                            (totalQuestions / 10).toDouble()),
+                                        showTitles: true,
+                                        reservedSize: 35)),
+                                rightTitles: const AxisTitles(),
+                                topTitles: const AxisTitles(),
+                                bottomTitles: AxisTitles(
+                                  sideTitles: SideTitles(
+                                    showTitles: true,
+                                    getTitlesWidget: bottomTitles,
+                                    reservedSize: 30,
+                                  ),
+                                ),
+                              ),
+                              barTouchData: BarTouchData(
+                                  enabled: true,
+                                  touchTooltipData: BarTouchTooltipData(
+                                    getTooltipItem:
+                                        (group, groupIndex, rod, rodIndex) {
+                                      var color = good_resp_color;
+                                      if (rodIndex == 1) {
+                                        color = bad_resp_color;
+                                      } else if (rodIndex == 2) {
+                                        color = no_resp_color;
+                                      }
+                                      return BarTooltipItem(
+                                          '${(rod.toY - rod.fromY).toInt()}',
+                                          TextStyle(color: color));
+                                    },
+                                  )),
+                              borderData: FlBorderData(
+                                border: Border(
+                                  bottom:
+                                      BorderSide(color: Colors.black, width: 4),
+                                  left: const BorderSide(
+                                      color: Colors.black, width: 4),
+                                  right: const BorderSide(
+                                      color: Colors.transparent),
+                                  top: const BorderSide(
+                                      color: Colors.transparent),
+                                ),
+                              ),
+                              gridData: const FlGridData(show: true),
+                              barGroups: [
+                                generateGroupData(
+                                    0,
+                                    weeklyFeedbackNum[0][0],
+                                    weeklyFeedbackNum[0][2],
+                                    weeklyFeedbackNum[0][1]),
+                                generateGroupData(
+                                    1,
+                                    weeklyFeedbackNum[1][0],
+                                    weeklyFeedbackNum[1][2],
+                                    weeklyFeedbackNum[1][1]),
+                                generateGroupData(
+                                    2,
+                                    weeklyFeedbackNum[2][0],
+                                    weeklyFeedbackNum[2][2],
+                                    weeklyFeedbackNum[2][1]),
+                                generateGroupData(
+                                    3,
+                                    weeklyFeedbackNum[3][0],
+                                    weeklyFeedbackNum[3][2],
+                                    weeklyFeedbackNum[3][1]),
+                                generateGroupData(
+                                    4,
+                                    weeklyFeedbackNum[4][0],
+                                    weeklyFeedbackNum[4][2],
+                                    weeklyFeedbackNum[4][1]),
+                                generateGroupData(
+                                    5,
+                                    weeklyFeedbackNum[5][0],
+                                    weeklyFeedbackNum[5][2],
+                                    weeklyFeedbackNum[5][1]),
+                                generateGroupData(
+                                    6,
+                                    weeklyFeedbackNum[6][0],
+                                    weeklyFeedbackNum[6][2],
+                                    weeklyFeedbackNum[6][1]),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
                     ],
                   ),
-                  SizedBox(
-                    height: 25,
-                  ),
-                  Container(
-                    width: 900,
-                    height: 500,
-                    child: AspectRatio(
-                      aspectRatio: 2,
-                      child: BarChart(
-                        BarChartData(
-                          alignment: BarChartAlignment.spaceEvenly,
-                          titlesData: FlTitlesData(
-                            leftTitles: const AxisTitles(
-                                sideTitles: SideTitles(
-                                    interval: 10,
-                                    showTitles: true,
-                                    reservedSize: 35)),
-                            rightTitles: const AxisTitles(),
-                            topTitles: const AxisTitles(),
-                            bottomTitles: AxisTitles(
-                              sideTitles: SideTitles(
-                                showTitles: true,
-                                getTitlesWidget: bottomTitles,
-                                reservedSize: 30,
+                ),
+                SizedBox(
+                  width: MediaQuery.sizeOf(context).width / 8,
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: 32,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Container(
+                        width: 300,
+                        height: 135,
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10))),
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8.0),
+                              child: Text(
+                                "Total Documents",
+                                style: TextStyle(
+                                    fontSize: 24, fontWeight: FontWeight.bold),
                               ),
                             ),
-                          ),
-                          barTouchData: BarTouchData(
-                              enabled: true,
-                              touchTooltipData: BarTouchTooltipData(
-                                getTooltipItem:
-                                    (group, groupIndex, rod, rodIndex) {
-                                  var color = good_resp_color;
-                                  if (rodIndex == 1) {
-                                    color = bad_resp_color;
-                                  } else if (rodIndex == 2) {
-                                    color = no_resp_color;
-                                  }
-                                  return BarTooltipItem(
-                                      '${(rod.toY - rod.fromY).toInt()}',
-                                      TextStyle(color: color));
-                                },
-                              )),
-                          borderData: FlBorderData(
-                            border: Border(
-                              bottom: BorderSide(color: Colors.black, width: 4),
-                              left: const BorderSide(
-                                  color: Colors.black, width: 4),
-                              right:
-                                  const BorderSide(color: Colors.transparent),
-                              top: const BorderSide(color: Colors.transparent),
-                            ),
-                          ),
-                          gridData: const FlGridData(show: true),
-                          barGroups: [
-                            generateGroupData(0, 20 + 10, 30 - 20, 40),
-                            generateGroupData(1, 20 + 10, 25 - 20, 10),
-                            generateGroupData(2, 15 + 10, 30 - 20, 20),
-                            generateGroupData(3, 30 + 10, 40 - 20, 30),
-                            generateGroupData(4, 10 + 10, 30 - 20, 30),
-                            generateGroupData(5, 23 + 10, 50 - 20, 10),
-                            generateGroupData(6, 10 + 10, 30 - 20, 2),
+                            Text(
+                              totalDocuments.toString(),
+                              style: TextStyle(fontSize: 64),
+                            )
                           ],
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(
-              width: MediaQuery.sizeOf(context).width / 8,
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                SizedBox(
-                  height: 32,
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Container(
-                    width: 300,
-                    height: 135,
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.all(Radius.circular(10))),
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8.0),
-                          child: Text(
-                            "Total Documents",
-                            style: TextStyle(
-                                fontSize: 24, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        Text(
-                          "152",
-                          style: TextStyle(fontSize: 64),
-                        )
-                      ],
+                    SizedBox(
+                      height: 12,
                     ),
-                  ),
-                ),
-                SizedBox(
-                  height: 12,
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Container(
-                    width: 300,
-                    height: 135,
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.all(Radius.circular(10))),
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8.0),
-                          child: Text(
-                            "Embeded Documents",
-                            style: TextStyle(
-                                fontSize: 24, fontWeight: FontWeight.bold),
-                          ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Container(
+                        width: 300,
+                        height: 135,
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10))),
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8.0),
+                              child: Text(
+                                "Embeded Documents",
+                                style: TextStyle(
+                                    fontSize: 24, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            Text(
+                              embeddedDocuments.toString(),
+                              style: TextStyle(fontSize: 64),
+                            )
+                          ],
                         ),
-                        Text(
-                          "133",
-                          style: TextStyle(fontSize: 64),
-                        )
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-                SizedBox(
-                  height: 12,
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Container(
-                    width: 300,
-                    height: 135,
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.all(Radius.circular(10))),
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8.0),
-                          child: Text(
-                            "Total Users",
-                            style: TextStyle(
-                                fontSize: 24, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        Text(
-                          "211",
-                          style: TextStyle(fontSize: 64),
-                        )
-                      ],
+                    SizedBox(
+                      height: 12,
                     ),
-                  ),
-                ),
-                SizedBox(
-                  height: 12,
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Container(
-                    width: 300,
-                    height: 155,
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.all(Radius.circular(10))),
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8.0),
-                          child: Text(
-                            "Total Question",
-                            style: TextStyle(
-                                fontSize: 24, fontWeight: FontWeight.bold),
-                          ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Container(
+                        width: 300,
+                        height: 135,
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10))),
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8.0),
+                              child: Text(
+                                "Total Users",
+                                style: TextStyle(
+                                    fontSize: 24, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            Text(
+                              totalUsers.toString(),
+                              style: TextStyle(fontSize: 64),
+                            )
+                          ],
                         ),
-                        Text(
-                          "Asked This Week",
-                          style: TextStyle(fontSize: 12),
-                        ),
-                        Text(
-                          "124",
-                          style: TextStyle(fontSize: 64),
-                        )
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-                SizedBox(
-                  height: 12,
-                ),
+                    SizedBox(
+                      height: 12,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Container(
+                        width: 300,
+                        height: 155,
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10))),
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8.0),
+                              child: Text(
+                                "Total Question",
+                                style: TextStyle(
+                                    fontSize: 24, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            Text(
+                              "Asked This Week",
+                              style: TextStyle(fontSize: 12),
+                            ),
+                            Text(
+                              totalQuestions.toString(),
+                              style: TextStyle(fontSize: 64),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 12,
+                    ),
+                  ],
+                )
               ],
-            )
-          ],
-        ),
-      ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

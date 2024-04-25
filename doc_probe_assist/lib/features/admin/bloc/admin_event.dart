@@ -3,6 +3,9 @@ part of 'admin_bloc.dart';
 @immutable
 sealed class AdminEvent {}
 
+// Analytics
+class LoadAnalyticsEvent extends AdminEvent {}
+
 //Users Panel
 class UsersFetchEvent extends AdminEvent {}
 

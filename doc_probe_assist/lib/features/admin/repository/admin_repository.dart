@@ -9,19 +9,34 @@ import 'package:doc_probe_assist/models/user_model.dart';
 
 class AdminRepository {
   final ApiService apiService;
+
+  // Analytics
+  final String getAnalyticsDataUrl = '/api/chatbot/analytics/';
   // User
-  final String getUsersUrl = '/auth/users/';
-  final String updateUserAccessUrl = '/auth/update-user/';
-  final String deleteUserUrl = '/auth/delete-user/';
+  final String getUsersUrl = '/api/auth/users/';
+  final String updateUserAccessUrl = '/api/auth/update-user/';
+  final String deleteUserUrl = '/api/auth/delete-user/';
   // Document
-  final String getAndUploadDocuments = '/chatbot/doc/';
-  final String updateDocumentUrl = '/chatbot/update-doc/';
+  final String getAndUploadDocuments = '/api/chatbot/doc/';
+  final String updateDocumentUrl = '/api/chatbot/update-doc/';
   // Feedback
-  final String getFeedbacksUrl = '/chatbot/feedback/';
+  final String getFeedbacksUrl = '/api/chatbot/feedback/';
 
   AdminRepository({
     required this.apiService,
   });
+
+// Analytics
+  Future<Map<String, dynamic>> getAnalyticsData() async {
+    Dio api = apiService.getApi();
+    try {
+      var response = await api.get(getAnalyticsDataUrl);
+      return response.data;
+    } on DioException catch (e) {
+      throw ApiException(
+          exception: e, error: ['Unexpected Error', 'Please try again later.']);
+    }
+  }
 
 // User
   Future<List<UserModel>> getUsers() async {

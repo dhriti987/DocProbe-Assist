@@ -34,16 +34,7 @@ class ReferenceTab extends StatelessWidget {
         } else if (state is ChatDeleteState) {
           chats.removeAt(state.index);
         } else if (state is NewChatMessageState) {
-          int chatIndex = chats
-              .indexWhere((element) => element.id == state.chatMessage.chatId);
-
-          if (state.chatMessage.id != -1) {
-            chats[chatIndex].chatMessages[chats[chatIndex]
-                .chatMessages
-                .indexWhere((element) => element.id == -1)] = state.chatMessage;
-          } else {
-            chats[chatIndex].chatMessages.add(state.chatMessage);
-          }
+          references = state.chatMessage.references;
         }
         return Container(
           decoration: const BoxDecoration(

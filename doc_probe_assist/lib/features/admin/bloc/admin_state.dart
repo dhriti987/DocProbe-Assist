@@ -7,6 +7,27 @@ sealed class AdminActionState extends AdminState {}
 
 final class AdminInitial extends AdminState {}
 
+// Analytics
+
+final class AnalyticsDataLoadingState extends AdminState {}
+
+final class AnalyticsDataLoadingSuccessState extends AdminState {
+  final Map<String, dynamic> weeklyFeedback;
+  final int totalDocuments;
+  final int embeddedDocuments;
+  final int totalUsers;
+  final int totalQuestions;
+
+  AnalyticsDataLoadingSuccessState(
+      {required this.totalDocuments,
+      required this.embeddedDocuments,
+      required this.totalUsers,
+      required this.totalQuestions,
+      required this.weeklyFeedback});
+}
+
+final class AnalyticsDataLoadingFailedState extends AdminState {}
+
 // User
 
 final class UserLoadingState extends AdminState {}

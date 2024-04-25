@@ -4,7 +4,7 @@ import 'package:doc_probe_assist/core/services/api_service.dart';
 
 class RegisterRepository {
   final ApiService apiService;
-  final registerURL = "/auth/register/";
+  final registerURL = "/api/auth/register/";
   RegisterRepository({required this.apiService});
 
   Future<void> register(

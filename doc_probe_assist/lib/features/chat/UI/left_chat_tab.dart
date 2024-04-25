@@ -489,7 +489,10 @@ class UserWidget extends StatelessWidget {
             onTap: onLogout,
             child: Text(
               "Logout",
-              style: Theme.of(context).textTheme.labelMedium,
+              style: Theme.of(context)
+                  .textTheme
+                  .labelMedium
+                  ?.copyWith(color: Colors.red),
             ),
           ),
         ];
