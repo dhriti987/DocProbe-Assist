@@ -69,10 +69,10 @@ class ReferenceTab extends StatelessWidget {
                         references[index].docName,
                       ),
                       subtitle: Text(
-                        "Page No: ${references[index].pageNumber + 1}",
+                        "Page No: ${references[index].pageNumber}",
                       ),
                       onTap: () => launchUrlString(
-                          '${dotenv.env['SERVER_URL'] ?? 'http://127.0.0.1:8000'}${references[index].url}#page=${references[index].pageNumber + 1}'),
+                          '${dotenv.env['SERVER_URL'] ?? 'http://127.0.0.1:8000'}${references[index].url}#page=${references[index].pageNumber}'),
                     );
                   },
                   itemCount: references.length,
