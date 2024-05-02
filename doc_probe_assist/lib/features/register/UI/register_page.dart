@@ -235,7 +235,7 @@ class RegisterPage extends StatelessWidget {
                                     } else {
                                       showDialog(
                                         context: context,
-                                        builder: (context) => AlertDialog(
+                                        builder: (context) => const AlertDialog(
                                           title: Text("Validation Error"),
                                           content:
                                               Text("Passwords are not Same"),
@@ -245,16 +245,16 @@ class RegisterPage extends StatelessWidget {
                                     // sl.get<RegisterRepository>().register(
                                     //     "abd", "cdd", "ab@mail.com", "mnbv9876");
                                   },
-                                  child: const Text('Register Request',
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontFamily: 'Adani')),
                                   style: ElevatedButton.styleFrom(
                                     padding: const EdgeInsets.symmetric(
                                       vertical: 16.0,
                                       horizontal: 30.0,
                                     ),
                                   ),
+                                  child: const Text('Register Request',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontFamily: 'Adani')),
                                 ),
                                 TextButton(
                                   onPressed: () {
