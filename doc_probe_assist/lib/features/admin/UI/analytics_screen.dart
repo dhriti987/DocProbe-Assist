@@ -256,52 +256,100 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                           ),
                         ),
                       ),
-                      DataTable(columns: [
-                        DataColumn(
-                          label: Text("Total Quiries"),
-                        ),
-                        DataColumn(
-                          label: Text(totalQues.toString()),
-                        ),
-                        DataColumn(
-                          label: Text('100%'),
-                        ),
-                      ], rows: [
-                        DataRow(cells: [
-                          DataCell(
-                            Text('Good Responses'),
-                          ),
-                          DataCell(
-                            Text(goodResponse.toString()),
-                          ),
-                          DataCell(
-                            Text(''),
-                          ),
-                        ]),
-                        DataRow(cells: [
-                          DataCell(
-                            Text('Bad Responses'),
-                          ),
-                          DataCell(
-                            Text(badResponse.toString()),
-                          ),
-                          DataCell(
-                            Text(''),
-                          ),
-                        ]),
-                        DataRow(cells: [
-                          DataCell(
-                            Text('No Responses'),
-                          ),
-                          DataCell(
-                            Text((totalQues - goodResponse - badResponse)
-                                .toString()),
-                          ),
-                          DataCell(
-                            Text(''),
-                          ),
-                        ]),
-                      ])
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 32, vertical: 16),
+                        child: DataTable(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              border: Border.all(
+                                width: 1,
+                              ),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
+                            ),
+                            columns: [
+                              DataColumn(
+                                label: Text(
+                                  "Total Quiries",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              DataColumn(
+                                label: Text(totalQues.toString()),
+                              ),
+                              DataColumn(
+                                label: Text('100%'),
+                              ),
+                            ],
+                            rows: [
+                              DataRow(cells: [
+                                DataCell(
+                                  Text(
+                                    'Good Responses',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium!
+                                        .copyWith(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                DataCell(
+                                  Text(goodResponse.toString()),
+                                ),
+                                DataCell(
+                                  Text(((goodResponse / totalQues) * 100)
+                                          .toStringAsFixed(2) +
+                                      '%'),
+                                ),
+                              ]),
+                              DataRow(cells: [
+                                DataCell(
+                                  Text(
+                                    'Bad Responses',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium!
+                                        .copyWith(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                DataCell(
+                                  Text(badResponse.toString()),
+                                ),
+                                DataCell(
+                                  Text(((badResponse / totalQues) * 100)
+                                          .toStringAsFixed(2) +
+                                      '%'),
+                                ),
+                              ]),
+                              DataRow(cells: [
+                                DataCell(
+                                  Text(
+                                    'No Responses',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium!
+                                        .copyWith(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                DataCell(
+                                  Text((totalQues - goodResponse - badResponse)
+                                      .toString()),
+                                ),
+                                DataCell(
+                                  Text((((totalQues -
+                                                      goodResponse -
+                                                      badResponse) /
+                                                  totalQues) *
+                                              100)
+                                          .toStringAsFixed(2) +
+                                      '%'),
+                                ),
+                              ]),
+                            ]),
+                      )
                     ],
                   ),
                 ),

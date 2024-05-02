@@ -76,6 +76,13 @@ class _AdminPageState extends State<AdminPage> {
               )),
               ListTile(
                 onTap: () {
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                },
+                title: const Text("Chatbot"),
+              ),
+              ListTile(
+                onTap: () {
                   setState(() {
                     index = 0;
                   });
