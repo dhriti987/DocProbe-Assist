@@ -126,7 +126,7 @@ class ChatWidget extends StatelessWidget {
         return Container(
           decoration: const BoxDecoration(
             image: DecorationImage(
-              opacity: 0.1,
+              opacity: 0.05,
               fit: BoxFit.contain,
               image: AssetImage("assets/doc_probe_logo.png"),
             ),
@@ -185,10 +185,6 @@ class ChatWidget extends StatelessWidget {
                     ),
                     TextField(
                       readOnly: !sendChat,
-                      // textAlign: TextAlign.center,
-                      onSubmitted: (value) {
-                        print(value);
-                      },
                       focusNode: FocusNode(
                         onKeyEvent: (FocusNode node, KeyEvent evt) {
                           final shiftWithEnter = evt is KeyDownEvent &&
@@ -199,11 +195,11 @@ class ChatWidget extends StatelessWidget {
                             if (index != null &&
                                 sendChat &&
                                 textEditingController.text.isNotEmpty) {
-                              // chatBloc.add(ResolveQueryEvent(
-                              //     chatIndex: chats[index!].id,
-                              //     query: textEditingController.text,
-                              //     docId: selectedDocument));
-                              // textEditingController.text = "";
+                              chatBloc.add(ResolveQueryEvent(
+                                  chatIndex: chats[index!].id,
+                                  query: textEditingController.text,
+                                  docId: selectedDocument));
+                              textEditingController.text = "";
                               sendChat = false;
                             }
                             return KeyEventResult.handled;
@@ -281,7 +277,7 @@ class ChatWidget extends StatelessWidget {
                   ),
                 ),
                 Flexible(
-                  child: Text(
+                  child: SelectableText(
                     chatMessage.query,
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
@@ -336,18 +332,32 @@ class ChatWidget extends StatelessWidget {
                             Row(children: [
                               IconButton(
                                 onPressed: () {
+                                  Clipboard.setData(ClipboardData(
+                                      text: chatMessage.response));
+                                },
+                                icon: Icon(Icons.copy_rounded),
+                                iconSize: 20,
+                              ),
+                              SizedBox(
+                                width: 15,
+                                height: 10,
+                              ),
+                              IconButton(
+                                onPressed: () {
                                   chatBloc.add(RegenerateResponseEvent(
                                       chatMessage: chatMessage));
                                 },
+                                iconSize: 20,
                                 icon: Icon(
                                   Icons.replay_rounded,
                                 ),
                               ),
                               SizedBox(
-                                width: 50,
+                                width: 15,
                                 height: 10,
                               ),
                               IconButton(
+                                  iconSize: 20,
                                   onPressed: () {
                                     showDialog(
                                       context: context,

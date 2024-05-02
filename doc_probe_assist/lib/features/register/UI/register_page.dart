@@ -38,7 +38,10 @@ class RegisterPage extends StatelessWidget {
                       onPressed: () {
                         context.go('/login');
                       },
-                      child: const Text('Ok'))
+                      child: const Text(
+                        'Ok',
+                        style: TextStyle(color: Colors.white),
+                      ))
                 ],
               );
             },
@@ -54,7 +57,10 @@ class RegisterPage extends StatelessWidget {
                     onPressed: () {
                       context.pop();
                     },
-                    child: const Text('Ok'))
+                    child: const Text(
+                      'Ok',
+                      style: TextStyle(color: Colors.white),
+                    ))
               ],
             ),
           );
@@ -227,7 +233,14 @@ class RegisterPage extends StatelessWidget {
                                                   passwordTextEditingController
                                                       .text));
                                     } else {
-                                      print('pass and confirm not same.');
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) => AlertDialog(
+                                          title: Text("Validation Error"),
+                                          content:
+                                              Text("Passwords are not Same"),
+                                        ),
+                                      );
                                     }
                                     // sl.get<RegisterRepository>().register(
                                     //     "abd", "cdd", "ab@mail.com", "mnbv9876");

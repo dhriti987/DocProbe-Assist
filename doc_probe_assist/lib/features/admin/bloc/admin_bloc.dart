@@ -52,13 +52,21 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
       var totalDocuments = data['total_documents'];
       var embeddedDocuments = data['embedded_documents'];
       var totalUsers = data['total_users'];
+      var weeklyTotalQuestions = data['weekly_total_questions'];
       var totalQuestions = data['total_questions'];
+      var goodBadResponse = data['good_bad_response'];
+      // var totalQuestions = 30;
+      // var goodBadResponse = [0, 0];
       emit(AnalyticsDataLoadingSuccessState(
-          weeklyFeedback: weeklyFeedback,
-          totalDocuments: totalDocuments,
-          embeddedDocuments: embeddedDocuments,
-          totalUsers: totalUsers,
-          totalQuestions: totalQuestions));
+        weeklyFeedback: weeklyFeedback,
+        totalDocuments: totalDocuments,
+        embeddedDocuments: embeddedDocuments,
+        totalUsers: totalUsers,
+        weeklyTotalQuestions: weeklyTotalQuestions,
+        totalQuestions: totalQuestions,
+        goodResponse: goodBadResponse['good_resp'],
+        badResponse: goodBadResponse['bad_resp'],
+      ));
     } catch (e) {
       emit(AnalyticsDataLoadingFailedState());
     }

@@ -29,7 +29,10 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   int totalDocuments = 0;
   int embeddedDocuments = 0;
   int totalUsers = 0;
-  int totalQuestions = 0;
+  int weeklyTotalQues = 0;
+  int totalQues = 0;
+  int goodResponse = 0;
+  int badResponse = 0;
 
   Widget bottomTitles(double value, TitleMeta meta) {
     const style = TextStyle(fontSize: 15);
@@ -59,7 +62,10 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
           totalDocuments = state.totalDocuments;
           embeddedDocuments = state.embeddedDocuments;
           totalUsers = state.totalUsers;
-          totalQuestions = state.totalQuestions;
+          weeklyTotalQues = state.weeklyTotalQuestions;
+          totalQues = state.totalQuestions;
+          goodResponse = state.goodResponse;
+          badResponse = state.badResponse;
         } else if (state is AnalyticsDataLoadingFailedState) {
           return AlertDialog(
             content:
@@ -167,7 +173,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                                 leftTitles: AxisTitles(
                                     sideTitles: SideTitles(
                                         interval: max(2.0,
-                                            (totalQuestions / 10).toDouble()),
+                                            (weeklyTotalQues / 10).toDouble()),
                                         showTitles: true,
                                         reservedSize: 35)),
                                 rightTitles: const AxisTitles(),
@@ -250,11 +256,57 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                           ),
                         ),
                       ),
+                      DataTable(columns: [
+                        DataColumn(
+                          label: Text("Total Quiries"),
+                        ),
+                        DataColumn(
+                          label: Text(totalQues.toString()),
+                        ),
+                        DataColumn(
+                          label: Text('100%'),
+                        ),
+                      ], rows: [
+                        DataRow(cells: [
+                          DataCell(
+                            Text('Good Responses'),
+                          ),
+                          DataCell(
+                            Text(goodResponse.toString()),
+                          ),
+                          DataCell(
+                            Text(''),
+                          ),
+                        ]),
+                        DataRow(cells: [
+                          DataCell(
+                            Text('Bad Responses'),
+                          ),
+                          DataCell(
+                            Text(badResponse.toString()),
+                          ),
+                          DataCell(
+                            Text(''),
+                          ),
+                        ]),
+                        DataRow(cells: [
+                          DataCell(
+                            Text('No Responses'),
+                          ),
+                          DataCell(
+                            Text((totalQues - goodResponse - badResponse)
+                                .toString()),
+                          ),
+                          DataCell(
+                            Text(''),
+                          ),
+                        ]),
+                      ])
                     ],
                   ),
                 ),
                 SizedBox(
-                  width: MediaQuery.sizeOf(context).width / 8,
+                  width: MediaQuery.sizeOf(context).width / 15,
                 ),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -376,7 +428,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                               style: TextStyle(fontSize: 12),
                             ),
                             Text(
-                              totalQuestions.toString(),
+                              weeklyTotalQues.toString(),
                               style: TextStyle(fontSize: 64),
                             )
                           ],

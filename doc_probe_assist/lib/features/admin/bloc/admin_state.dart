@@ -16,14 +16,21 @@ final class AnalyticsDataLoadingSuccessState extends AdminState {
   final int totalDocuments;
   final int embeddedDocuments;
   final int totalUsers;
+  final int weeklyTotalQuestions;
   final int totalQuestions;
+  final int goodResponse;
+  final int badResponse;
 
-  AnalyticsDataLoadingSuccessState(
-      {required this.totalDocuments,
-      required this.embeddedDocuments,
-      required this.totalUsers,
-      required this.totalQuestions,
-      required this.weeklyFeedback});
+  AnalyticsDataLoadingSuccessState({
+    required this.totalDocuments,
+    required this.embeddedDocuments,
+    required this.totalUsers,
+    required this.weeklyTotalQuestions,
+    required this.weeklyFeedback,
+    required this.totalQuestions,
+    required this.goodResponse,
+    required this.badResponse,
+  });
 }
 
 final class AnalyticsDataLoadingFailedState extends AdminState {}
