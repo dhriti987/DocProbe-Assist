@@ -68,6 +68,13 @@ class _ChatPageState extends State<ChatPage> {
       ],
     );
     return Scaffold(
+      appBar: AppBar(
+        leading: Image.asset(
+          'assets/acoe_logo.png"',
+          fit: BoxFit.contain,
+          height: 56,
+        ),
+      ),
       body: Container(
         width: double.maxFinite,
         height: double.maxFinite,
@@ -112,7 +119,6 @@ class _ChatPageState extends State<ChatPage> {
           },
         ),
       ),
-      extendBodyBehindAppBar: true,
     );
   }
 }

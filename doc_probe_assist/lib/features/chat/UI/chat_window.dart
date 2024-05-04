@@ -137,8 +137,35 @@ class ChatWidget extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
+                  SizedBox(
+                    width: 300,
+                    child: DropdownSearch<Document>(
+                      clearButtonProps: ClearButtonProps(
+                          icon: Icon(Icons.cancel), isVisible: true),
+                      popupProps: const PopupProps.menu(
+                        fit: FlexFit.loose,
+                        showSearchBox: true,
+                      ),
+                      onChanged: (value) => selectedDocument = value?.id,
+                      items: documents,
+                      itemAsString: (item) => item.docName,
+                      filterFn: (item, filter) {
+                        return item.docName.startsWith(filter);
+                      },
+                      dropdownDecoratorProps: const DropDownDecoratorProps(
+                        dropdownSearchDecoration: InputDecoration(
+                            labelText: "Filter by Directory",
+                            labelStyle: TextStyle(
+                              fontWeight: FontWeight.w900,
+                              color: Color.fromARGB(255, 1, 49, 121),
+                            ),
+                            contentPadding: EdgeInsets.zero),
+                      ),
+                    ),
+                  ),
                   const SizedBox(
                     height: 65,
+                    width: 20,
                   ),
                   SizedBox(
                     width: 300,

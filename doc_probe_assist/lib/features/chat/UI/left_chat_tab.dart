@@ -152,8 +152,7 @@ class LeftChatTab extends StatelessWidget {
               const Divider(
                 thickness: 2,
               ),
-              Container(
-                height: 500,
+              Expanded(
                 child: ListView.builder(
                   padding: EdgeInsets.zero,
                   shrinkWrap: true,
@@ -168,7 +167,6 @@ class LeftChatTab extends StatelessWidget {
                   itemCount: chats.length,
                 ),
               ),
-              const Spacer(),
               SizedBox(
                 height: 65,
                 child: Image.asset("assets/acoe_logo.png"),
