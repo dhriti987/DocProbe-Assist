@@ -5,6 +5,7 @@ import 'package:doc_probe_assist/models/chat_model.dart';
 import 'package:doc_probe_assist/models/user_model.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
@@ -87,16 +88,16 @@ class LeftChatTab extends StatelessWidget {
         }
         return Container(
           decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Color(0x990B74B0),
-                Color(0x9975479C),
-                Color(0x99BD3861),
-              ],
-            ),
-          ),
+              // gradient: LinearGradient(
+              //   begin: Alignment.topCenter,
+              //   end: Alignment.bottomCenter,
+              //   // colors: [
+              //   //   Color(0x990B74B0),
+              //   //   Color(0x9975479C),
+              //   //   Color(0x99BD3861),
+              //   // ],
+              // ),
+              ),
           child: Column(
             children: [
               UserWidget(
@@ -151,17 +152,21 @@ class LeftChatTab extends StatelessWidget {
               const Divider(
                 thickness: 2,
               ),
-              ListView.builder(
-                padding: EdgeInsets.zero,
-                shrinkWrap: true,
-                itemBuilder: (context, index) {
-                  return ChatTile(
-                    chat: chats[index],
-                    chatBloc: chatBloc,
-                    index: index,
-                  );
-                },
-                itemCount: chats.length,
+              Container(
+                height: 500,
+                child: ListView.builder(
+                  padding: EdgeInsets.zero,
+                  shrinkWrap: true,
+                  scrollDirection: Axis.vertical,
+                  itemBuilder: (context, index) {
+                    return ChatTile(
+                      chat: chats[index],
+                      chatBloc: chatBloc,
+                      index: index,
+                    );
+                  },
+                  itemCount: chats.length,
+                ),
               ),
               const Spacer(),
               SizedBox(
@@ -226,6 +231,7 @@ class UserWidget extends StatelessWidget {
           ],
         ),
       ),
+      color: Colors.white,
       itemBuilder: (context) {
         return [
           PopupMenuItem(
@@ -489,10 +495,10 @@ class UserWidget extends StatelessWidget {
             onTap: onLogout,
             child: Text(
               "Logout",
-              style: Theme.of(context)
-                  .textTheme
-                  .labelMedium
-                  ?.copyWith(color: Colors.red),
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold,
+                  ),
             ),
           ),
         ];

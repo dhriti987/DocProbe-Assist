@@ -125,12 +125,12 @@ class ChatWidget extends StatelessWidget {
 
         return Container(
           decoration: const BoxDecoration(
-            image: DecorationImage(
-              opacity: 0.05,
-              fit: BoxFit.contain,
-              image: AssetImage("assets/doc_probe_logo.png"),
-            ),
-          ),
+              // image: DecorationImage(
+              //   opacity: 0.05,
+              //   fit: BoxFit.contain,
+              //   image: AssetImage("assets/doc_probe_logo.png"),
+              // ),
+              ),
           margin: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
           child: Column(
             children: [
@@ -143,6 +143,8 @@ class ChatWidget extends StatelessWidget {
                   SizedBox(
                     width: 300,
                     child: DropdownSearch<Document>(
+                      clearButtonProps: ClearButtonProps(
+                          icon: Icon(Icons.cancel), isVisible: true),
                       popupProps: const PopupProps.menu(
                         fit: FlexFit.loose,
                         showSearchBox: true,
@@ -185,28 +187,6 @@ class ChatWidget extends StatelessWidget {
                     ),
                     TextField(
                       readOnly: !sendChat,
-                      focusNode: FocusNode(
-                        onKeyEvent: (FocusNode node, KeyEvent evt) {
-                          final shiftWithEnter = evt is KeyDownEvent &&
-                              evt.physicalKey == PhysicalKeyboardKey.enter &&
-                              HardwareKeyboard.instance.isShiftPressed;
-                          print(HardwareKeyboard.instance.isShiftPressed);
-                          if (shiftWithEnter) {
-                            if (index != null &&
-                                sendChat &&
-                                textEditingController.text.isNotEmpty) {
-                              chatBloc.add(ResolveQueryEvent(
-                                  chatIndex: chats[index!].id,
-                                  query: textEditingController.text,
-                                  docId: selectedDocument));
-                              textEditingController.text = "";
-                              sendChat = false;
-                            }
-                            return KeyEventResult.handled;
-                          }
-                          return KeyEventResult.ignored;
-                        },
-                      ),
                       controller: textEditingController,
                       decoration: InputDecoration(
                         hintText: "Type your Query Here",

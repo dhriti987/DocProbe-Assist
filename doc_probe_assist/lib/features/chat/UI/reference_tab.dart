@@ -38,16 +38,16 @@ class ReferenceTab extends StatelessWidget {
         }
         return Container(
           decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Color(0x990B74B0),
-                Color(0x9975479C),
-                Color(0x99BD3861),
-              ],
-            ),
-          ),
+              // gradient: LinearGradient(
+              //   begin: Alignment.topCenter,
+              //   end: Alignment.bottomCenter,
+              //   colors: [
+              //     Color(0x990B74B0),
+              //     Color(0x9975479C),
+              //     Color(0x99BD3861),
+              //   ],
+              // ),
+              ),
           child: Column(
             children: [
               ListTile(
@@ -65,8 +65,13 @@ class ReferenceTab extends StatelessWidget {
                   shrinkWrap: true,
                   itemBuilder: (context, index) {
                     return ListTile(
+                      leading: Icon(Icons.file_open),
                       title: Text(
                         references[index].docName,
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodySmall!
+                            .copyWith(color: Colors.black),
                       ),
                       subtitle: Text(
                         "Page No: ${references[index].pageNumber}",

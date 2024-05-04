@@ -5,6 +5,7 @@ import 'package:doc_probe_assist/features/chat/bloc/chat_bloc.dart';
 import 'package:doc_probe_assist/models/chat_model.dart';
 import 'package:doc_probe_assist/service_locator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ChatPage extends StatefulWidget {
@@ -23,7 +24,43 @@ class _ChatPageState extends State<ChatPage> {
     Widget screen = Row(
       children: [
         Expanded(flex: 1, child: LeftChatTab(chatBloc: chatBloc)),
+        SizedBox(
+          width: 20,
+        ),
+        Container(
+          alignment: Alignment.topCenter,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(10)),
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color(0x880B74B0),
+                Color(0x8875479C),
+                Color(0x88BD3861),
+              ],
+            ),
+          ),
+          height: 800,
+          width: 5,
+        ),
         Expanded(flex: 4, child: ChatWidget(chatBloc: chatBloc)),
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(10)),
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color(0x880B74B0),
+                Color(0x8875479C),
+                Color(0x88BD3861),
+              ],
+            ),
+          ),
+          height: 800,
+          width: 5,
+        ),
         Expanded(
           flex: 1,
           child: ReferenceTab(chatBloc: chatBloc),
@@ -35,14 +72,14 @@ class _ChatPageState extends State<ChatPage> {
         width: double.maxFinite,
         height: double.maxFinite,
         decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color(0x880B74B0),
-              Color(0x8875479C),
-              Color(0x88BD3861),
-            ],
-          ),
-        ),
+            // gradient: LinearGradient(
+            //   colors: [
+            //     Color(0x880B74B0),
+            //     Color(0x8875479C),
+            //     Color(0x88BD3861),
+            //   ],
+            // ),
+            ),
         child: BlocBuilder<ChatBloc, ChatState>(
           bloc: chatBloc,
           buildWhen: (previous, current) {

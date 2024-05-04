@@ -143,6 +143,7 @@ class AdminRepository {
     Dio api = apiService.getApi();
     try {
       var response = await api.get(getFeedbacksUrl);
+      print(response.data);
       return FeedBackModel.listFromJson(response.data);
     } on DioException catch (e) {
       throw ApiException(
