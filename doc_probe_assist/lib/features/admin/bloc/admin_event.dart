@@ -56,11 +56,28 @@ class DeleteDocumentEvent extends AdminEvent {
   DeleteDocumentEvent({required this.document});
 }
 
+class DeleteDirectoryEvent extends AdminEvent {
+  final MyDirectory directiry;
+
+  DeleteDirectoryEvent({required this.directiry});
+}
+
 class UploadDocumentButtonClickedEvent extends AdminEvent {
   final Uint8List? file;
+  final int? dirId;
   final String name;
 
-  UploadDocumentButtonClickedEvent({required this.file, required this.name});
+  UploadDocumentButtonClickedEvent({
+    required this.file,
+    required this.name,
+    required this.dirId,
+  });
+}
+
+class CreateDirectoryButtonClickedEvent extends AdminEvent {
+  final String name;
+
+  CreateDirectoryButtonClickedEvent({required this.name});
 }
 
 class NewDocumentSelectedEvent extends AdminEvent {

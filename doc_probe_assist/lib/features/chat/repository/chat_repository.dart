@@ -5,6 +5,7 @@ import 'package:doc_probe_assist/core/exceptions/api_exceptions.dart';
 import 'package:doc_probe_assist/core/services/api_service.dart';
 import 'package:doc_probe_assist/models/chat_message_model.dart';
 import 'package:doc_probe_assist/models/chat_model.dart';
+import 'package:doc_probe_assist/models/directory_model.dart';
 import 'package:doc_probe_assist/models/document_model.dart';
 import 'package:doc_probe_assist/models/reference_model.dart';
 import 'package:doc_probe_assist/models/user_model.dart';
@@ -12,6 +13,7 @@ import 'package:doc_probe_assist/models/user_model.dart';
 class ChatRepository {
   final ApiService apiService;
   final getDocumentUrl = "/api/chatbot/doc/?embedded=true";
+  final directoryUrl = '/api/chatbot/directory/';
   final getUserUrl = "/api/auth/user-info/";
   final chatsURL = '/api/chatbot/chats/';
   final chatsUpdateDeleteURL = '/api/chatbot/edit_chats/';
@@ -32,6 +34,17 @@ class ChatRepository {
       throw ApiException(
           exception: e,
           error: ['Unexpected Error', 'Error fetching documents']);
+    }
+  }
+
+  Future<List<MyDirectory>> getDirectories() async {
+    Dio api = apiService.getApi();
+    try {
+      var response = await api.get(directoryUrl);
+      return MyDirectory.listFromJson(response.data);
+    } on DioException catch (e) {
+      throw ApiException(
+          exception: e, error: ['Unexpected Error', 'Please try again later.']);
     }
   }
 
@@ -102,13 +115,17 @@ class ChatRepository {
   }
 
   Future<void> uploadDocument(
-      Uint8List file, String name, String fileName) async {
+      Uint8List file, String name, String fileName, int? dirId) async {
     Dio api = apiService.getApi();
     try {
-      FormData formData = FormData.fromMap({
+      Map<String, dynamic> data = {
         "file": MultipartFile.fromBytes(file, filename: fileName),
-        "name": name
-      });
+        "name": fileName
+      };
+      if (dirId != null) {
+        data['directory'] = dirId;
+      }
+      FormData formData = FormData.fromMap(data);
 
       await api.post(uploadDocumentURL, data: formData);
     } on DioException catch (e) {
@@ -143,7 +160,7 @@ class ChatRepository {
   }
 
   Future<Map<String, dynamic>> createAnswer(
-      int chatId, int? docId, String question) async {
+      int chatId, int? docId, int? dirId, String question) async {
     Dio api = apiService.getApi();
     api.options.connectTimeout = null;
     var data = {
@@ -152,6 +169,9 @@ class ChatRepository {
     };
     if (docId != null) {
       data.putIfAbsent('doc_id', () => docId);
+    }
+    if (dirId != null) {
+      data.putIfAbsent('dir_id', () => dirId);
     }
     try {
       var response =

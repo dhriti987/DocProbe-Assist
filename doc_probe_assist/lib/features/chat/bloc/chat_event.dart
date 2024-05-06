@@ -46,9 +46,13 @@ class UploadDocumentButtonClickedEvent extends ChatEvent {
   final Uint8List? file;
   final String name;
   final String fileName;
+  final int? dirId;
 
   UploadDocumentButtonClickedEvent(
-      {required this.file, required this.name, required this.fileName});
+      {required this.file,
+      required this.name,
+      required this.fileName,
+      required this.dirId});
 }
 
 class NewDocumentSelectedEvent extends ChatEvent {
@@ -58,14 +62,26 @@ class NewDocumentSelectedEvent extends ChatEvent {
   NewDocumentSelectedEvent({required this.file, required this.name});
 }
 
+class NewDirectorySelectedEvent extends ChatEvent {
+  final int? selectedDirectory;
+
+  NewDirectorySelectedEvent({required this.selectedDirectory});
+}
+
 // Chat Window Event
 
 class ResolveQueryEvent extends ChatEvent {
   final int chatIndex;
   final String query;
   final int? docId;
+  final int? dirId;
 
-  ResolveQueryEvent({required this.chatIndex, required this.query, this.docId});
+  ResolveQueryEvent({
+    required this.chatIndex,
+    required this.query,
+    this.docId,
+    this.dirId,
+  });
 }
 
 class RegenerateResponseEvent extends ChatEvent {

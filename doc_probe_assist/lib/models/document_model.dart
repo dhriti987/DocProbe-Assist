@@ -4,6 +4,8 @@ class Document {
   String time;
   String empId;
   String url;
+  String? directory;
+  int? directoryId;
   String embeddingStatus;
 
   Document(
@@ -12,6 +14,8 @@ class Document {
       this.time = "",
       this.empId = "",
       this.url = "",
+      this.directory = "",
+      required this.directoryId,
       this.embeddingStatus = ""});
 
   factory Document.fromJson(Map<String, dynamic> json) {
@@ -21,6 +25,8 @@ class Document {
       url: json['file'] ?? '',
       empId: json['username'] ?? '',
       time: json['date'] ?? '',
+      directory: json['directory_name'],
+      directoryId: json['directory'],
       embeddingStatus: json['embeddingStatus'] ?? '',
     );
   }

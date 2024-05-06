@@ -2,7 +2,9 @@ import 'dart:typed_data';
 
 import 'package:doc_probe_assist/features/chat/bloc/chat_bloc.dart';
 import 'package:doc_probe_assist/models/chat_model.dart';
+import 'package:doc_probe_assist/models/directory_model.dart';
 import 'package:doc_probe_assist/models/user_model.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -22,6 +24,7 @@ class LeftChatTab extends StatelessWidget {
   Widget build(BuildContext context) {
     List<ChatModel> chats = [];
     UserModel? user;
+    List<MyDirectory> allDirectory = [];
     return BlocConsumer<ChatBloc, ChatState>(
       bloc: chatBloc,
       listenWhen: (previous, current) => current is ChatActionState,
@@ -81,6 +84,7 @@ class LeftChatTab extends StatelessWidget {
         if (state is ChatPageLoadingSuccessState) {
           chats = state.chats;
           user = state.user;
+          allDirectory = state.dirs;
         } else if (state is NewChatCreatedState) {
           chats.add(state.chat);
         } else if (state is ChatDeleteState) {
@@ -101,6 +105,7 @@ class LeftChatTab extends StatelessWidget {
           child: Column(
             children: [
               UserWidget(
+                  dirs: allDirectory,
                   user: user,
                   onLogout: () => chatBloc.add(LogoutButtonClickedEvent()),
                   chatBloc: chatBloc),
@@ -167,10 +172,6 @@ class LeftChatTab extends StatelessWidget {
                   itemCount: chats.length,
                 ),
               ),
-              SizedBox(
-                height: 65,
-                child: Image.asset("assets/acoe_logo.png"),
-              ),
             ],
           ),
         );
@@ -184,10 +185,13 @@ class UserWidget extends StatelessWidget {
       {super.key,
       required this.user,
       required this.onLogout,
-      required this.chatBloc});
+      required this.chatBloc,
+      required this.dirs});
 
   final UserModel? user;
   final void Function() onLogout;
+
+  final List<MyDirectory> dirs;
 
   final ChatBloc chatBloc;
 
@@ -195,6 +199,7 @@ class UserWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     TextEditingController documentNameTextEditingController =
         TextEditingController();
+    int? selectedDirectory;
     FilePickerResult? result;
     return PopupMenuButton(
       offset: const Offset(20, 40),
@@ -253,10 +258,28 @@ class UserWidget extends StatelessWidget {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          TextField(
-                            controller: documentNameTextEditingController,
-                            decoration: const InputDecoration(
-                              labelText: "Enter Document Name:",
+                          DropdownSearch<MyDirectory>(
+                            clearButtonProps: ClearButtonProps(
+                                icon: Icon(Icons.cancel), isVisible: true),
+                            popupProps: const PopupProps.menu(
+                              fit: FlexFit.loose,
+                              showSearchBox: true,
+                            ),
+                            onChanged: (value) => selectedDirectory = value?.id,
+                            items: dirs,
+                            itemAsString: (item) => item.dirName,
+                            filterFn: (item, filter) {
+                              return item.dirName.startsWith(filter);
+                            },
+                            dropdownDecoratorProps:
+                                const DropDownDecoratorProps(
+                              dropdownSearchDecoration: InputDecoration(
+                                  labelText: "Select Directory",
+                                  labelStyle: TextStyle(
+                                    fontWeight: FontWeight.w900,
+                                    color: Color.fromARGB(255, 1, 49, 121),
+                                  ),
+                                  contentPadding: EdgeInsets.zero),
                             ),
                           ),
                           SizedBox(
@@ -317,8 +340,8 @@ class UserWidget extends StatelessWidget {
                               chatBloc.add(UploadDocumentButtonClickedEvent(
                                   file: file,
                                   fileName: fileName,
-                                  name:
-                                      documentNameTextEditingController.text));
+                                  dirId: selectedDirectory,
+                                  name: fileName));
                               file = null;
                               documentNameTextEditingController.text = "";
                               fileName = "No Document Selected";

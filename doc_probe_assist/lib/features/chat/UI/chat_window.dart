@@ -1,6 +1,7 @@
 import 'package:doc_probe_assist/features/chat/bloc/chat_bloc.dart';
 import 'package:doc_probe_assist/models/chat_message_model.dart';
 import 'package:doc_probe_assist/models/chat_model.dart';
+import 'package:doc_probe_assist/models/directory_model.dart';
 import 'package:doc_probe_assist/models/document_model.dart';
 // import 'package:doc_probe_assist/models/user_model.dart';
 import 'package:dropdown_search/dropdown_search.dart';
@@ -26,7 +27,9 @@ class ChatWidget extends StatelessWidget {
     List<ChatMessage> messages = [];
     int? index;
     int? selectedDocument;
+    int? selectedDirectory;
     List<Document> documents = [];
+    List<MyDirectory> dirs = [];
     ScrollController scrollController = ScrollController();
     bool sendChat = true;
 
@@ -86,7 +89,10 @@ class ChatWidget extends StatelessWidget {
         if (state is ChatPageLoadingSuccessState) {
           chats = List.from(state.chats);
           documents = state.documents;
+          dirs = state.dirs;
           // user = state.user;
+        } else if (state is NewDirectorySelectedState) {
+          selectedDirectory = state.selectedDirectory;
         } else if (state is ChangeChatState) {
           messages = chats[state.index].chatMessages;
           index = state.index;
@@ -94,6 +100,7 @@ class ChatWidget extends StatelessWidget {
           chats.add(state.chat);
         } else if (state is ChatDeleteState) {
           chats.removeAt(state.index);
+          index = null;
         } else if (state is NewChatMessageState) {
           int chatIndex = chats
               .indexWhere((element) => element.id == state.chatMessage.chatId);
@@ -106,7 +113,6 @@ class ChatWidget extends StatelessWidget {
           } else {
             chats[chatIndex].chatMessages.add(state.chatMessage);
           }
-          print(chats[chatIndex].chatMessages.length);
         } else if (state is RegenerateAnswerState) {
           int chatIndex = chats
               .indexWhere((element) => element.id == state.chatMessage.chatId);
@@ -139,18 +145,20 @@ class ChatWidget extends StatelessWidget {
                 children: [
                   SizedBox(
                     width: 300,
-                    child: DropdownSearch<Document>(
+                    child: DropdownSearch<MyDirectory>(
                       clearButtonProps: ClearButtonProps(
                           icon: Icon(Icons.cancel), isVisible: true),
                       popupProps: const PopupProps.menu(
                         fit: FlexFit.loose,
                         showSearchBox: true,
                       ),
-                      onChanged: (value) => selectedDocument = value?.id,
-                      items: documents,
-                      itemAsString: (item) => item.docName,
+                      onChanged: (value) => chatBloc.add(
+                          NewDirectorySelectedEvent(
+                              selectedDirectory: value?.id)),
+                      items: dirs,
+                      itemAsString: (item) => item.dirName,
                       filterFn: (item, filter) {
-                        return item.docName.startsWith(filter);
+                        return item.dirName.startsWith(filter);
                       },
                       dropdownDecoratorProps: const DropDownDecoratorProps(
                         dropdownSearchDecoration: InputDecoration(
@@ -177,7 +185,12 @@ class ChatWidget extends StatelessWidget {
                         showSearchBox: true,
                       ),
                       onChanged: (value) => selectedDocument = value?.id,
-                      items: documents,
+                      items: selectedDirectory != null
+                          ? documents
+                              .where((element) =>
+                                  element.directoryId == selectedDirectory)
+                              .toList()
+                          : documents,
                       itemAsString: (item) => item.docName,
                       filterFn: (item, filter) {
                         return item.docName.startsWith(filter);
@@ -222,14 +235,14 @@ class ChatWidget extends StatelessWidget {
                         ),
                         suffixIcon: IconButton(
                           onPressed: () {
-                            print(index);
                             if (index != null &&
                                 sendChat &&
                                 textEditingController.text.isNotEmpty) {
                               chatBloc.add(ResolveQueryEvent(
                                   chatIndex: chats[index!].id,
                                   query: textEditingController.text,
-                                  docId: selectedDocument));
+                                  docId: selectedDocument,
+                                  dirId: selectedDirectory));
                               textEditingController.text = "";
                               sendChat = false;
                             }

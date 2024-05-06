@@ -1,8 +1,10 @@
 import 'dart:typed_data';
 
 import 'package:doc_probe_assist/features/admin/bloc/admin_bloc.dart';
+import 'package:doc_probe_assist/models/directory_model.dart';
 import 'package:doc_probe_assist/models/document_model.dart';
 import 'package:doc_probe_assist/service_locator.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +26,7 @@ class _DocumentScreenState extends State<DocumentScreen>
 
   @override
   void initState() {
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
     super.initState();
   }
 
@@ -33,21 +35,87 @@ class _DocumentScreenState extends State<DocumentScreen>
     final adminBloc = sl.get<AdminBloc>();
     List<Document> allDocs = [];
     List<Document> requestedDocs = [];
+    List<MyDirectory> allDirectory = [];
 
     return BlocConsumer<AdminBloc, AdminState>(
       bloc: adminBloc,
       buildWhen: (previous, current) => current is! AdminActionState,
       listenWhen: (previous, current) => current is AdminActionState,
-      listener: (context, state) {},
+      listener: (context, state) {
+        if (state is UploadDocumentFailedState) {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              content: Text('Document Uplod Failed. Please try Again Later.'),
+              actions: [
+                ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text(
+                      'Ok',
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium
+                          ?.copyWith(fontSize: 10),
+                    ))
+              ],
+            ),
+          );
+        } else if (state is CreateDirectoryFailedState) {
+          Navigator.pop(context);
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              content: Text('Directory create Failed. Please try Again Later.'),
+              actions: [
+                ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text(
+                      'Ok',
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium
+                          ?.copyWith(fontSize: 10),
+                    ))
+              ],
+            ),
+          );
+        } else if (state is DirectoryDeleteFailedState) {
+          showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                content: const Text('Problem deleting this directory'),
+                actions: [
+                  ElevatedButton(
+                      onPressed: () {
+                        context.pop();
+                      },
+                      child: const Text('Ok'))
+                ],
+              );
+            },
+          );
+        }
+      },
       builder: (context, state) {
         if (state is AdminInitial) {
           adminBloc.add(AllDocumentFetchEvent());
           adminBloc.add(RequestedDocumentFetchEvent());
+        } else if (state is UploadDocumentSuccessState) {
+          allDocs.add(state.document);
         } else if (state is DocumentLoadingState) {
           return const Center(child: CircularProgressIndicator());
         } else if (state is DocumentLoadingSuccessState) {
           allDocs = state.documents['all_doc']!;
           requestedDocs = state.documents['req_doc']!;
+          allDirectory = state.directories;
+        } else if (state is CreateDirectorySuccessState) {
+          Navigator.pop(context);
+          allDirectory.add(state.directory);
         } else if (state is DocumentLoadingFailedState) {
           return AlertDialog(
             content:
@@ -79,6 +147,9 @@ class _DocumentScreenState extends State<DocumentScreen>
               );
             },
           );
+        } else if (state is DirectoryDeleteState) {
+          allDirectory.removeAt(allDirectory
+              .indexWhere((element) => element.id == state.directory.id));
         } else if (state is DocumentApprovedState) {
           allDocs.add(state.document);
           requestedDocs.removeAt(requestedDocs
@@ -114,6 +185,10 @@ class _DocumentScreenState extends State<DocumentScreen>
                   "All Documents",
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
+                Text(
+                  "Directories",
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
               ],
               controller: _tabController,
             ),
@@ -125,9 +200,15 @@ class _DocumentScreenState extends State<DocumentScreen>
                     docs: requestedDocs,
                     isRequested: true,
                     adminBloc: adminBloc,
+                    dirs: allDirectory,
                   ),
                   DocumentTab(
                     docs: allDocs,
+                    adminBloc: adminBloc,
+                    dirs: allDirectory,
+                  ),
+                  DirectoryTab(
+                    directories: allDirectory,
                     adminBloc: adminBloc,
                   )
                 ],
@@ -140,14 +221,162 @@ class _DocumentScreenState extends State<DocumentScreen>
   }
 }
 
+class DirectoryTab extends StatelessWidget {
+  const DirectoryTab(
+      {super.key, required this.directories, required this.adminBloc});
+
+  final List<MyDirectory> directories;
+  final AdminBloc adminBloc;
+
+  @override
+  Widget build(BuildContext context) {
+    TextEditingController directoryNameTextEditingController =
+        TextEditingController();
+    return Column(
+      mainAxisSize: MainAxisSize.max,
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              ElevatedButton(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: const Text("Create Directory"),
+                          content: SizedBox(
+                            width: 300,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                TextField(
+                                  controller:
+                                      directoryNameTextEditingController,
+                                  decoration: const InputDecoration(
+                                    labelText: "Enter Directory Name:",
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          actions: [
+                            TextButton(
+                                onPressed: () {
+                                  adminBloc.add(
+                                      CreateDirectoryButtonClickedEvent(
+                                          name:
+                                              directoryNameTextEditingController
+                                                  .text));
+                                },
+                                child: const Text("Create")),
+                            TextButton(
+                                onPressed: () {
+                                  context.pop();
+                                },
+                                child: const Text("Cancel")),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  child: Text('+ Create Directory'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                  )),
+              Card(
+                elevation: 10,
+                child: DataTable(
+                  columns: [
+                    const DataColumn(
+                      label: Text("Sr No."),
+                    ),
+                    const DataColumn(
+                      label: SizedBox(
+                          width: 200,
+                          child: Text(
+                            "Directory Name",
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          )),
+                    ),
+                    const DataColumn(
+                      label: Text(" "),
+                    ),
+                  ],
+                  rows: directories
+                      .asMap()
+                      .entries
+                      .map(
+                        (e) => DataRow(
+                          cells: [
+                            DataCell(
+                              Text((e.key + 1).toString()),
+                            ),
+                            DataCell(
+                              Text(e.value.dirName),
+                            ),
+                            DataCell(IconButton(
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: const Text("Delete Directory"),
+                                    content: Text(
+                                        "Sure want to Delete Directory ${e.value.dirName}?"),
+                                    actions: [
+                                      ElevatedButton(
+                                          onPressed: () {
+                                            adminBloc.add(DeleteDirectoryEvent(
+                                                directiry: e.value));
+
+                                            context.pop();
+                                          },
+                                          child: const Text(
+                                            "Delete",
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          )),
+                                      ElevatedButton(
+                                          onPressed: () => context.pop(),
+                                          child: const Text(
+                                            "Cancel",
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ))
+                                    ],
+                                  ),
+                                );
+                              },
+                              icon: const Icon(Icons.delete_rounded),
+                              color: Colors.red,
+                            )),
+                          ],
+                        ),
+                      )
+                      .toList(),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class DocumentTab extends StatelessWidget {
   const DocumentTab(
       {super.key,
       required this.docs,
       this.isRequested = false,
-      required this.adminBloc});
+      required this.adminBloc,
+      required this.dirs});
 
   final List<Document> docs;
+  final List<MyDirectory> dirs;
   final bool isRequested;
   final AdminBloc adminBloc;
 
@@ -157,6 +386,7 @@ class DocumentTab extends StatelessWidget {
         TextEditingController();
     FilePickerResult? result;
 
+    int? selectedDirectory;
     return SingleChildScrollView(
       child: Column(
         mainAxisSize: MainAxisSize.max,
@@ -167,41 +397,154 @@ class DocumentTab extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 !isRequested
-                    ? ElevatedButton(
-                        onPressed: () {
-                          showDialog(
-                              context: context,
-                              builder: (context) {
-                                var fileName = 'No File Choosen';
-                                Uint8List? file;
-                                return BlocConsumer<AdminBloc, AdminState>(
-                                  bloc: adminBloc,
-                                  listener: (context, state) {},
-                                  builder: (context, state) {
-                                    if (state is NewDocumentSelectedState) {
-                                      fileName = state.fileName;
-                                      file = state.file;
-                                    }
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ElevatedButton(
+                              onPressed: () {
+                                // showDialog(
+                                //     context: context,
+                                //     builder: (context) {
+                                //       var fileName = 'No File Choosen';
+                                //       Uint8List? file;
+                                //       return BlocConsumer<AdminBloc,
+                                //           AdminState>(
+                                //         bloc: adminBloc,
+                                //         listener: (context, state) {},
+                                //         builder: (context, state) {
+                                //           if (state
+                                //               is NewDocumentSelectedState) {
+                                //             fileName = state.fileName;
+                                //             file = state.file;
+                                //           }
 
-                                    if (state is UploadDocumentFailedState) {
-                                      return AlertDialog(
-                                        content: Text(
-                                            'Document Uploded Failed. Please try Again Later.'),
-                                        actions: [
-                                          ElevatedButton(
-                                              onPressed: () {
-                                                Navigator.of(context).pop();
-                                              },
-                                              child: Text(
-                                                'Ok',
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .titleMedium
-                                                    ?.copyWith(fontSize: 10),
-                                              ))
-                                        ],
-                                      );
-                                    }
+                                //           if (state
+                                //               is UploadDocumentFailedState) {
+                                //             return AlertDialog(
+                                //               content: Text(
+                                //                   'Document Uploded Failed. Please try Again Later.'),
+                                //               actions: [
+                                //                 ElevatedButton(
+                                //                     onPressed: () {
+                                //                       Navigator.of(context)
+                                //                           .pop();
+                                //                     },
+                                //                     child: Text(
+                                //                       'Ok',
+                                //                       style: Theme.of(context)
+                                //                           .textTheme
+                                //                           .titleMedium
+                                //                           ?.copyWith(
+                                //                               fontSize: 10),
+                                //                     ))
+                                //               ],
+                                //             );
+                                //           }
+                                //           return AlertDialog(
+                                //             title:
+                                //                 const Text("Upload Document"),
+                                //             content: SizedBox(
+                                //               width: 300,
+                                //               child: Column(
+                                //                 mainAxisSize: MainAxisSize.min,
+                                //                 children: [
+                                //                   TextField(
+                                //                     controller:
+                                //                         documentNameTextEditingController,
+                                //                     decoration:
+                                //                         const InputDecoration(
+                                //                       labelText:
+                                //                           "Enter Document Name:",
+                                //                     ),
+                                //                   ),
+                                //                   SizedBox(
+                                //                     height: 20,
+                                //                   ),
+                                //                   Row(
+                                //                     children: [
+                                //                       SizedBox(
+                                //                           width: 150,
+                                //                           child: Text(fileName,
+                                //                               overflow:
+                                //                                   TextOverflow
+                                //                                       .ellipsis)),
+                                //                       SizedBox(
+                                //                         width: 20,
+                                //                       ),
+                                //                       ElevatedButton(
+                                //                           onPressed: () async {
+                                //                             result =
+                                //                                 await FilePicker
+                                //                                     .platform
+                                //                                     .pickFiles(
+                                //                               type: FileType
+                                //                                   .custom,
+                                //                               allowedExtensions: [
+                                //                                 'pdf'
+                                //                               ],
+                                //                             );
+                                //                             if (result !=
+                                //                                 null) {
+                                //                               var _paths =
+                                //                                   result!.files
+                                //                                       .first;
+                                //                               adminBloc.add(
+                                //                                   NewDocumentSelectedEvent(
+                                //                                       file: _paths
+                                //                                           .bytes!,
+                                //                                       name: _paths
+                                //                                           .name));
+                                //                             } else {
+                                //                               // User canceled the picker
+                                //                               print(
+                                //                                   'result null');
+                                //                             }
+                                //                           },
+                                //                           child: Text(
+                                //                             'Choose File',
+                                //                             style: Theme.of(
+                                //                                     context)
+                                //                                 .textTheme
+                                //                                 .displayMedium
+                                //                                 ?.copyWith(
+                                //                                     fontSize:
+                                //                                         10),
+                                //                           ))
+                                //                     ],
+                                //                   )
+                                //                 ],
+                                //               ),
+                                //             ),
+                                //             actions: [
+                                //               TextButton(
+                                //                   onPressed: () {
+                                //                     if (file != null) {
+                                //                       adminBloc.add(
+                                //                           UploadDocumentButtonClickedEvent(
+                                //                               file: file,
+                                //                               name: fileName));
+                                //                     } else {
+                                //                       print('file null');
+                                //                     }
+
+                                //                     Navigator.of(context).pop();
+                                //                   },
+                                //                   child: const Text("Upload")),
+                                //               TextButton(
+                                //                   onPressed: () {
+                                //                     Navigator.of(context).pop();
+                                //                   },
+                                //                   child: const Text("Cancel")),
+                                //             ],
+                                //           );
+                                //         },
+                                //       );
+                                //     });
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    var fileName = 'No File Choosen';
+                                    Uint8List? file;
                                     return AlertDialog(
                                       title: const Text("Upload Document"),
                                       content: SizedBox(
@@ -209,12 +552,38 @@ class DocumentTab extends StatelessWidget {
                                         child: Column(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
-                                            TextField(
-                                              controller:
-                                                  documentNameTextEditingController,
-                                              decoration: const InputDecoration(
-                                                labelText:
-                                                    "Enter Document Name:",
+                                            DropdownSearch<MyDirectory>(
+                                              clearButtonProps:
+                                                  ClearButtonProps(
+                                                      icon: Icon(Icons.cancel),
+                                                      isVisible: true),
+                                              popupProps: const PopupProps.menu(
+                                                fit: FlexFit.loose,
+                                                showSearchBox: true,
+                                              ),
+                                              onChanged: (value) =>
+                                                  selectedDirectory = value?.id,
+                                              items: dirs,
+                                              itemAsString: (item) =>
+                                                  item.dirName,
+                                              filterFn: (item, filter) {
+                                                return item.dirName
+                                                    .startsWith(filter);
+                                              },
+                                              dropdownDecoratorProps:
+                                                  const DropDownDecoratorProps(
+                                                dropdownSearchDecoration:
+                                                    InputDecoration(
+                                                        labelText:
+                                                            "Add to Directory",
+                                                        labelStyle: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.w900,
+                                                          color: Color.fromARGB(
+                                                              255, 1, 49, 121),
+                                                        ),
+                                                        contentPadding:
+                                                            EdgeInsets.zero),
                                               ),
                                             ),
                                             SizedBox(
@@ -224,9 +593,21 @@ class DocumentTab extends StatelessWidget {
                                               children: [
                                                 SizedBox(
                                                     width: 150,
-                                                    child: Text(fileName,
-                                                        overflow: TextOverflow
-                                                            .ellipsis)),
+                                                    child: BlocBuilder<
+                                                        AdminBloc, AdminState>(
+                                                      bloc: adminBloc,
+                                                      buildWhen: (previous,
+                                                              current) =>
+                                                          current
+                                                              is NewDocumentSelectedState,
+                                                      builder:
+                                                          (context, state) {
+                                                        return Text(fileName,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis);
+                                                      },
+                                                    )),
                                                 SizedBox(
                                                   width: 20,
                                                 ),
@@ -241,14 +622,18 @@ class DocumentTab extends StatelessWidget {
                                                         ],
                                                       );
                                                       if (result != null) {
-                                                        var _paths =
+                                                        var fileObject =
                                                             result!.files.first;
+                                                        fileName =
+                                                            fileObject.name;
+                                                        file = fileObject.bytes;
                                                         adminBloc.add(
                                                             NewDocumentSelectedEvent(
-                                                                file: _paths
-                                                                    .bytes!,
-                                                                name: _paths
-                                                                    .name));
+                                                                file: file!,
+                                                                name:
+                                                                    fileName));
+                                                        // // sl.get<ChatRepository>().uploadDocument(
+                                                        // //     _paths.bytes!, _paths.name);
                                                       } else {
                                                         // User canceled the picker
                                                         print('result null');
@@ -274,29 +659,38 @@ class DocumentTab extends StatelessWidget {
                                                 adminBloc.add(
                                                     UploadDocumentButtonClickedEvent(
                                                         file: file,
+                                                        dirId:
+                                                            selectedDirectory,
                                                         name: fileName));
+                                                file = null;
+                                                documentNameTextEditingController
+                                                    .text = "";
+                                                fileName =
+                                                    "No Document Selected";
+                                                context.pop();
                                               } else {
                                                 print('file null');
                                               }
 
-                                              Navigator.of(context).pop();
+                                              // Navigator.of(context).pop();
                                             },
                                             child: const Text("Upload")),
                                         TextButton(
                                             onPressed: () {
-                                              Navigator.of(context).pop();
+                                              context.pop();
                                             },
                                             child: const Text("Cancel")),
                                       ],
                                     );
                                   },
                                 );
-                              });
-                        },
-                        child: Text('+ Add Document'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                        ))
+                              },
+                              child: Text('+ Add Document'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                              )),
+                        ],
+                      )
                     : SizedBox(),
                 Card(
                   elevation: 10,
@@ -320,6 +714,7 @@ class DocumentTab extends StatelessWidget {
                               maxLines: 1,
                             )),
                       ),
+                      DataColumn(label: const Text("Directory")),
                       DataColumn(
                         label: !isRequested
                             ? const Text("Status")
@@ -365,6 +760,9 @@ class DocumentTab extends StatelessWidget {
                                       overflow: TextOverflow.ellipsis,
                                       maxLines: 1,
                                     )),
+                              ),
+                              DataCell(
+                                Text(e.value.directory ?? ''),
                               ),
                               DataCell(
                                 !isRequested

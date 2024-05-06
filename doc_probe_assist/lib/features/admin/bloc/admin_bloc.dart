@@ -4,10 +4,12 @@ import 'dart:typed_data';
 import 'package:bloc/bloc.dart';
 import 'package:doc_probe_assist/core/exceptions/api_exceptions.dart';
 import 'package:doc_probe_assist/features/admin/repository/admin_repository.dart';
+import 'package:doc_probe_assist/models/directory_model.dart';
 import 'package:doc_probe_assist/models/document_model.dart';
 import 'package:doc_probe_assist/models/feedback_model.dart';
 import 'package:doc_probe_assist/models/user_model.dart';
 import 'package:doc_probe_assist/service_locator.dart';
+import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
 part 'admin_event.dart';
@@ -38,6 +40,8 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     on<ApproveDocumentEvent>(onApproveDocumentEvent);
     on<UploadDocumentButtonClickedEvent>(onUploadDocumentButtonClickedEvent);
     on<NewDocumentSelectedEvent>(onNewDocumentSelectedEvent);
+    on<CreateDirectoryButtonClickedEvent>(onCreateDirectoryButtonClickedEvent);
+    on<DeleteDirectoryEvent>(onDeleteDirectoryEvent);
 
     //Feedback
     on<AllFeedbackFetchEvent>(onAllFeedbackFetchEvent);
@@ -143,8 +147,10 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     try {
       var allDocuments = await adminRepository.getAllDocuments();
       var requestedDocuments = await adminRepository.getRequestedDocuments();
+      var allDirectory = await adminRepository.getDirectories();
       var documents = {'all_doc': allDocuments, 'req_doc': requestedDocuments};
-      emit(DocumentLoadingSuccessState(documents: documents));
+      emit(DocumentLoadingSuccessState(
+          documents: documents, directories: allDirectory));
     } catch (e) {
       emit(DocumentLoadingFailedState());
     }
@@ -173,8 +179,8 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
   Future<FutureOr<void>> onUploadDocumentButtonClickedEvent(
       UploadDocumentButtonClickedEvent event, Emitter<AdminState> emit) async {
     try {
-      Document doc =
-          await adminRepository.uploadDocument(event.file!, event.name);
+      Document doc = await adminRepository.uploadDocument(
+          event.file!, event.name, event.dirId);
       emit(UploadDocumentSuccessState(document: doc));
     } on ApiException catch (e) {
       print(e.error);
@@ -196,6 +202,27 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     } on ApiException catch (e) {
       print(e.error);
       emit(FeedbackLoadingFailedState());
+    }
+  }
+
+  FutureOr<void> onCreateDirectoryButtonClickedEvent(
+      CreateDirectoryButtonClickedEvent event, Emitter<AdminState> emit) async {
+    try {
+      var directory = await adminRepository.createDirectory(event.name);
+      emit(CreateDirectorySuccessState(directory: directory));
+    } on ApiException catch (e) {
+      print(e.error);
+      emit(CreateDirectoryFailedState());
+    }
+  }
+
+  FutureOr<void> onDeleteDirectoryEvent(
+      DeleteDirectoryEvent event, Emitter<AdminState> emit) async {
+    try {
+      await adminRepository.deleteDirectory(event.directiry.id);
+      emit(DirectoryDeleteState(directory: event.directiry));
+    } catch (e) {
+      emit(DirectoryDeleteFailedState());
     }
   }
 }

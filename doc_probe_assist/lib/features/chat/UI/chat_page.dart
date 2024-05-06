@@ -69,10 +69,49 @@ class _ChatPageState extends State<ChatPage> {
     );
     return Scaffold(
       appBar: AppBar(
-        leading: Image.asset(
-          'assets/acoe_logo.png"',
-          fit: BoxFit.contain,
-          height: 56,
+        leadingWidth: 120,
+        toolbarHeight: 60,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+                colors: <Color>[
+                  Color(0xbb0B74B0),
+                  Color(0xbb75479C),
+                  Color(0xbbBD3861),
+                ]),
+          ),
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            child: Container(
+              height: 100,
+              width: 100,
+              padding: EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10), color: Colors.white),
+              child: Image.asset(
+                'assets/acoe_logo.png',
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+        ],
+        leading: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          child: Container(
+            height: 100,
+            width: 100,
+            padding: EdgeInsets.all(4),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10), color: Colors.white),
+            child: Image.asset(
+              'assets/adani_power.png',
+              fit: BoxFit.contain,
+            ),
+          ),
         ),
       ),
       body: Container(

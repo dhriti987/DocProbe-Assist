@@ -24,7 +24,6 @@ class ReferenceTab extends StatelessWidget {
       builder: (context, state) {
         if (state is ChatPageLoadingSuccessState) {
           chats = List.from(state.chats);
-          // print(chats[0].chatMessages[0].references);
         } else if (state is ChangeChatState) {
           references = chats[state.index].chatMessages.isNotEmpty
               ? chats[state.index].chatMessages.last.references
@@ -83,11 +82,6 @@ class ReferenceTab extends StatelessWidget {
                   itemCount: references.length,
                 ),
               ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 50, vertical: 10),
-                child: Image.asset("assets/adani_power.png"),
-              )
             ],
           ),
         );

@@ -7,6 +7,7 @@ import 'package:doc_probe_assist/features/chat/repository/chat_repository.dart';
 import 'package:doc_probe_assist/features/login/repository/login_repository.dart';
 import 'package:doc_probe_assist/models/chat_message_model.dart';
 import 'package:doc_probe_assist/models/chat_model.dart';
+import 'package:doc_probe_assist/models/directory_model.dart';
 import 'package:doc_probe_assist/models/document_model.dart';
 import 'package:doc_probe_assist/models/reference_model.dart';
 import 'package:doc_probe_assist/models/user_model.dart';
@@ -32,6 +33,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<RatingChangedEvent>(onRatingChangedEvent);
     on<UploadDocumentButtonClickedEvent>(onUploadDocumentButtonClickedEvent);
     on<NewDocumentSelectedEvent>(onNewDocumentSelectedEvent);
+    on<NewDirectorySelectedEvent>(onNewDirectorySelectedEvent);
     on<FeedbackSubmitEvent>(onFeedbackSubmitEvent);
   }
 
@@ -41,8 +43,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     List<Document> documents = await chatRepository.getAllDocuments();
     UserModel user = await chatRepository.getUser();
     List<ChatModel> chats = await chatRepository.getAllChats();
+    List<MyDirectory> dirs = await chatRepository.getDirectories();
     emit(ChatPageLoadingSuccessState(
-        user: user, chats: chats, documents: documents));
+        user: user, chats: chats, documents: documents, dirs: dirs));
   }
 
   FutureOr<void> onChatTileClickedEvent(
@@ -101,7 +104,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
               references: []),
           references: []));
       var response = await chatRepository.createAnswer(
-          event.chatIndex, event.docId, event.query);
+          event.chatIndex, event.docId, event.dirId, event.query);
       var chatMessage = response['chat'];
       var references = response['references'];
       chatMessage.animate = true;
@@ -153,7 +156,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       UploadDocumentButtonClickedEvent event, Emitter<ChatState> emit) async {
     try {
       await chatRepository.uploadDocument(
-          event.file!, event.name, event.fileName);
+          event.file!, event.name, event.fileName, event.dirId);
       emit(UploadDocumentSuccessState());
     } on ApiException catch (_) {
       emit(UploadDocumentFailedState());
@@ -163,6 +166,11 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   FutureOr<void> onNewDocumentSelectedEvent(
       NewDocumentSelectedEvent event, Emitter<ChatState> emit) {
     emit(NewDocumentSelectedState(fileName: event.name, file: event.file));
+  }
+
+  FutureOr<void> onNewDirectorySelectedEvent(
+      NewDirectorySelectedEvent event, Emitter<ChatState> emit) {
+    emit(NewDirectorySelectedState(selectedDirectory: event.selectedDirectory));
   }
 
   Future<FutureOr<void>> onFeedbackSubmitEvent(

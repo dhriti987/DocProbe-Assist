@@ -188,7 +188,7 @@ class UserScreen extends StatelessWidget {
                                                         context.pop();
                                                       },
                                                       child:
-                                                          const Text('Cancle')),
+                                                          const Text('Cancel')),
                                                 ],
                                               ));
 

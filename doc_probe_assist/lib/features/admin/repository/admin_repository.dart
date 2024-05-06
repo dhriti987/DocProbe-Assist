@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:doc_probe_assist/core/exceptions/api_exceptions.dart';
 import 'package:doc_probe_assist/core/services/api_service.dart';
+import 'package:doc_probe_assist/models/directory_model.dart';
 import 'package:doc_probe_assist/models/document_model.dart';
 import 'package:doc_probe_assist/models/feedback_model.dart';
 import 'package:doc_probe_assist/models/user_model.dart';
@@ -19,6 +20,7 @@ class AdminRepository {
   // Document
   final String getAndUploadDocuments = '/api/chatbot/doc/';
   final String updateDocumentUrl = '/api/chatbot/update-doc/';
+  final String directoryUrl = '/api/chatbot/directory/';
   // Feedback
   final String getFeedbacksUrl = '/api/chatbot/feedback/';
 
@@ -113,7 +115,6 @@ class AdminRepository {
     try {
       var response = await api
           .patch(updateDocumentUrl + id.toString(), data: {'isVerified': true});
-      print(response.data);
       return Document.fromJson(response.data);
     } on DioException catch (e) {
       throw ApiException(
@@ -121,13 +122,30 @@ class AdminRepository {
     }
   }
 
-  Future<Document> uploadDocument(Uint8List file, String fileName) async {
+  Future<MyDirectory> createDirectory(String dirName) async {
     Dio api = apiService.getApi();
     try {
-      FormData formData = FormData.fromMap({
+      var response = await api.post(directoryUrl, data: {"name": dirName});
+      return MyDirectory.fromJson(response.data);
+    } on DioException catch (e) {
+      throw ApiException(
+          exception: e,
+          error: ['Unexpected Error', 'Error uploading Document.']);
+    }
+  }
+
+  Future<Document> uploadDocument(
+      Uint8List file, String fileName, int? dirId) async {
+    Dio api = apiService.getApi();
+    try {
+      Map<String, dynamic> data = {
         "file": MultipartFile.fromBytes(file, filename: fileName),
         "name": fileName
-      });
+      };
+      if (dirId != null) {
+        data['directory'] = dirId;
+      }
+      FormData formData = FormData.fromMap(data);
 
       var response = await api.post(getAndUploadDocuments, data: formData);
       return Document.fromJson(response.data);
@@ -138,12 +156,32 @@ class AdminRepository {
     }
   }
 
+  Future<List<MyDirectory>> getDirectories() async {
+    Dio api = apiService.getApi();
+    try {
+      var response = await api.get(directoryUrl);
+      return MyDirectory.listFromJson(response.data);
+    } on DioException catch (e) {
+      throw ApiException(
+          exception: e, error: ['Unexpected Error', 'Please try again later.']);
+    }
+  }
+
+  Future<void> deleteDirectory(int id) async {
+    Dio api = apiService.getApi();
+    try {
+      await api.delete(directoryUrl + id.toString());
+    } on DioException catch (e) {
+      throw ApiException(
+          exception: e, error: ['Unexpected Error', 'Please try again later.']);
+    }
+  }
+
   // Feedback
   Future<List<FeedBackModel>> getFeedback() async {
     Dio api = apiService.getApi();
     try {
       var response = await api.get(getFeedbacksUrl);
-      print(response.data);
       return FeedBackModel.listFromJson(response.data);
     } on DioException catch (e) {
       throw ApiException(

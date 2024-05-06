@@ -12,10 +12,14 @@ class ChatPageLoadingState extends ChatState {}
 class ChatPageLoadingSuccessState extends ChatState {
   final List<ChatModel> chats;
   final List<Document> documents;
+  final List<MyDirectory> dirs;
   final UserModel user;
 
   ChatPageLoadingSuccessState(
-      {required this.chats, required this.documents, required this.user});
+      {required this.chats,
+      required this.documents,
+      required this.user,
+      required this.dirs});
 }
 
 class ChatPageLoadingFailedState extends ChatState {}
@@ -82,6 +86,12 @@ class NewDocumentSelectedState extends ChatActionState {
   final Uint8List file;
 
   NewDocumentSelectedState({required this.fileName, required this.file});
+}
+
+class NewDirectorySelectedState extends ChatActionState {
+  final int? selectedDirectory;
+
+  NewDirectorySelectedState({required this.selectedDirectory});
 }
 
 class UploadDocumentSuccessState extends ChatActionState {}

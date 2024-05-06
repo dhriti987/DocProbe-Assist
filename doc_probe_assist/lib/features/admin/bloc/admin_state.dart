@@ -66,11 +66,21 @@ final class DocumentLoadingState extends AdminState {}
 
 final class DocumentLoadingSuccessState extends AdminState {
   final Map<String, List<Document>> documents;
+  final List<MyDirectory> directories;
 
-  DocumentLoadingSuccessState({required this.documents});
+  DocumentLoadingSuccessState(
+      {required this.documents, required this.directories});
 }
 
 final class DocumentLoadingFailedState extends AdminState {}
+
+final class DirectoryLoadingSuccessState extends AdminState {
+  final List<Document> directory;
+
+  DirectoryLoadingSuccessState({required this.directory});
+}
+
+final class DirectoryLoadingFailedState extends AdminState {}
 
 class DocumentDeleteState extends AdminState {
   final Document document;
@@ -79,6 +89,14 @@ class DocumentDeleteState extends AdminState {
 }
 
 class DocumentDeleteFailedState extends AdminState {}
+
+class DirectoryDeleteState extends AdminState {
+  final MyDirectory directory;
+
+  DirectoryDeleteState({required this.directory});
+}
+
+class DirectoryDeleteFailedState extends AdminActionState {}
 
 class DocumentApprovedState extends AdminState {
   final Document document;
@@ -101,7 +119,15 @@ class UploadDocumentSuccessState extends AdminState {
   UploadDocumentSuccessState({required this.document});
 }
 
-class UploadDocumentFailedState extends AdminState {}
+class UploadDocumentFailedState extends AdminActionState {}
+
+class CreateDirectorySuccessState extends AdminState {
+  final MyDirectory directory;
+
+  CreateDirectorySuccessState({required this.directory});
+}
+
+class CreateDirectoryFailedState extends AdminActionState {}
 
 // Feedback
 
