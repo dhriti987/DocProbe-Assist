@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
 
 class AboutUsPage extends StatelessWidget {
   const AboutUsPage({super.key});
@@ -52,7 +53,7 @@ class AboutUsPage extends StatelessWidget {
                       text: 'Features & Limitations',
                     ),
                     Tab(
-                      text: 'How It Works',
+                      text: 'FAQs',
                     ),
                   ],
                 ),
@@ -87,8 +88,32 @@ class AboutUsPage extends StatelessWidget {
   }
 }
 
-class AboutUsSection extends StatelessWidget {
+class AboutUsSection extends StatefulWidget {
   const AboutUsSection({super.key});
+
+  @override
+  State<AboutUsSection> createState() => _AboutUsSectionState();
+}
+
+class _AboutUsSectionState extends State<AboutUsSection> {
+  late VideoPlayerController _controller;
+
+  @override
+  void initState() {
+    _controller = VideoPlayerController.asset('assets/ad.mp4')
+      ..initialize().then((value) {
+        _controller.play();
+
+        setState(() {});
+      });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -124,14 +149,21 @@ class AboutUsSection extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 20.0),
-                SizedBox(
-                  width: imageWidth,
-                  height: imageHeight,
-                  child: Image.network(
-                    'https://www.shutterstock.com/image-vector/3d-artificial-intelligence-digital-brain-600nw-2288372371.jpg',
-                    fit: BoxFit.cover,
-                  ),
-                ),
+
+                Container(
+                    color: Colors.black,
+                    height: 340,
+                    width: 700,
+                    child: VideoPlayer(_controller)),
+
+                // SizedBox(
+                //   width: imageWidth,
+                //   height: imageHeight,
+                //   child: Image.network(
+                //     'https://www.shutterstock.com/image-vector/3d-artificial-intelligence-digital-brain-600nw-2288372371.jpg',
+                //     fit: BoxFit.cover,
+                //   ),
+                // ),
               ],
             );
           },
@@ -316,81 +348,89 @@ class HowItWorksSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           const Text(
-            'How It Works',
+            'FAQs',
             style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 20.0),
           SizedBox(
             height: 400.0,
             child: ListView.builder(
-              scrollDirection: Axis.horizontal,
               itemCount: 4,
               itemBuilder: (context, index) {
                 List<Map<String, String>> contents = [
                   {
-                    'title': 'User Interaction',
-                    'content':
-                        'Doc Probe Assist provides a seamless interface for users to submit their documents and ask questions, enhancing the overall user experience.'
+                    'title':
+                        'Within the capabilities of DocProbe Assist, what types of questions are most likely to yield accurate and insightful responses?',
+                    'content': """
+
+# Identifying Optimal Prompt Styles for DocProbe Assist
+
+Query: Within the capabilities of DocProbe Assist, what types of questions are most likely to yield accurate and insightful responses?
+
+DocProbe Assist Capabilities:
+
+DocProbe Assist can effectively handle a variety of question formats, but certain styles tend to optimize its ability to deliver accurate and insightful responses. Here's a breakdown of these preferred structures:
+
+* Factual Inquiries: Focus on seeking objective, verifiable information. Utilize keywords like what is, define, when was, or who discovered. For instance, what is the capital of France?
+
+* List Generation: Aim to acquire an ordered list of items. Employ keywords like list, enumerate, name some, or give me a few. An example: enumerate the phases of the water cycle.
+
+* Instructional Prompts: Target obtaining clear steps to complete a task. Leverage keywords like how to, steps for, or instructions on. For instance, how to change a tire?
+
+* Summarization Requests: Strive for a concise overview of a particular topic. Include keywords like summarize, in short, or the main points of. An example: summarize the life of Albert Einstein.
+
+* Comparison Prompts: Focus on highlighting similarities and differences between things. Utilize keywords like compare, contrast, differences between, or similarities of. For instance, compare and contrast DNA and RNA.
+
+* Creative Text Generation: Target generation of imaginative text formats like poems, scripts, or code. Employ keywords like write a poem about, generate a story with the prompt, or create a Python script for. An example: write a limerick about a grumpy cat.
+
+* Context-Specific Question Answering: Provide surrounding text alongside your question. Include keywords like based on the passage, according to the text, in this article, or can you answer a question about. For instance, based on the passage, what are the causes of the French Revolution? (Provide the passage beforehand).
+
+* Translation Prompts: Target conversion of text from one language to another. Utilize keywords like translate, convert to, or in French. An example: translate this sentence to Spanish: Hello, how are you?
+
+* Code Completion Prompts: Target acquiring assistance in finishing or suggesting code snippets. Include keywords like complete the code, what comes next, or function for. For instance, complete the code to find the factorial of a number in Python: def factorial(n): ...
+
+* Open-Ended Inquiries: Encourage discussion and exploration of ideas. Utilize keywords like what do you think about, why is it important, or discuss the implications of. An example: what do you think the future of artificial intelligence holds?
+
+Remember:
+
+* The more specific your question, the better the answer will be.
+* Strategic use of keywords guides DocProbe Assist towards the type of response you desire.
+* Be mindful that DocProbe Assist might not have built-in safety features for factual or sensitive topics, so double-check the information it provides.
+
+"""
                   },
                   {
-                    'title': 'Advanced Text Processing',
-                    'content':
-                        'Our platform utilizes advanced text processing techniques to analyze and extract information from documents with high accuracy.'
+                    'title': 'How do I use DocProbe Assist?',
+                    'content': """1. Upload your document or provide a link.
+2. Ask your question in a clear and concise manner.
+3. DocProbe Assist will analyze the document and provide you with an answer.
+"""
                   },
                   {
-                    'title': 'Intelligent Answer Generation',
+                    'title': 'Is DocProbe Assist secure?',
                     'content':
-                        'Using advanced machine learning algorithms, Doc Probe Assist generates intelligent answers to user queries based on document content.'
+                        """Data security is a top priority for DocProbe Assist. We employ secure protocols to protect your documents and information."""
                   },
                   {
-                    'title': 'Document Security',
+                    'title':
+                        'What if DocProbe Assist can not answer my question?',
                     'content':
-                        'We prioritize the security and confidentiality of your documents, ensuring that your data is protected at all times.'
+                        'Add the feedback to the query. We will look into it.'
                   },
                 ];
-                return Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Container(
-                    padding: const EdgeInsets.all(10.0),
-                    width: 400,
-                    height: 400,
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Color(0xff0b74b0),
-                          Color(0xff75479c),
-                          Color(0xffbd3861),
-                        ],
-                      ),
-                      shape: BoxShape.rectangle,
-                      color: Colors.blue,
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            contents[index]['title']!,
-                            style: const TextStyle(
-                                fontSize: 24.0, color: Colors.white),
-                          ),
-                          const SizedBox(height: 20.0),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              contents[index]['content']!,
-                              textAlign: TextAlign.justify,
-                              style: const TextStyle(
-                                  fontSize: 16.0, color: Colors.white),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                return ExpansionTile(
+                  leading: Icon(
+                    Icons.square,
                   ),
+                  title: Text('${contents[index]['title']}'),
+                  expandedAlignment: Alignment.topLeft,
+                  expandedCrossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Text('${contents[index]['content']}'),
+                    )
+                  ],
                 );
               },
             ),

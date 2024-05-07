@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:doc_probe_assist/core/router/router.dart';
 import 'package:doc_probe_assist/core/theme/common_theme.dart';
 import 'package:doc_probe_assist/service_locator.dart';
@@ -20,6 +22,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
+      scrollBehavior: MaterialScrollBehavior().copyWith(
+        dragDevices: {
+          PointerDeviceKind.mouse,
+          PointerDeviceKind.touch,
+          PointerDeviceKind.trackpad
+        },
+      ),
       routerConfig: sl.get<AppRouter>().getRouter(),
       debugShowCheckedModeBanner: false,
       theme: lightTheme,
